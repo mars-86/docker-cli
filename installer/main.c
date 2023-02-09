@@ -8,14 +8,14 @@ int main(int argc, char *argv[])
     show_banner();
     int opt = 'n';
 
-    printf("This will install docker engine in your system\nAre you sure you want to continue [Y/n]");
-    scanf("%d", &opt);
+    printf("This will install docker engine in your system\nAre you sure you want to continue [Y/n] ");
+    scanf("%c", &opt);
 
-    if (opt != 'Y') {
-        printf("Instalation cancelled");
+#ifdef __DEBUG
+    printf("%c", opt);
+#endif
+    if (opt != 'Y')
         return ECANCELEDINSTALL;
-    }
-    return ECANCELEDINSTALL;
 
     int status = 0;
     if ((status = check_previous_install()) > 0)

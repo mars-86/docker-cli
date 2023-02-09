@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[])
 {
+    show_banner();
+
     int status = 0;
     if ((status = check_previous_install()) > 0)
         return status;

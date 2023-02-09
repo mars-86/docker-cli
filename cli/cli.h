@@ -1,0 +1,4 @@
+#ifndef __DOCKER_CLI_INCLUDED_H__
+#define __DOCKER_CLI_INCLUDED_H__
+
+#endif // __DOCKER_CLI_INCLUDED_H__

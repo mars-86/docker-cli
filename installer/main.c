@@ -1,10 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "installer.h"
+#include "../constants/inc/error_codes.h"
 
 int main(int argc, char *argv[])
 {
     show_banner();
+    int opt = 'n';
+
+    printf("This will install docker engine in your system\nAre you sure you want to continue [Y/n]");
+    scanf("%d", &opt);
+
+    if (opt != 'Y') {
+        printf("Instalation cancelled");
+        return ECANCELEDINSTALL;
+    }
+    return ECANCELEDINSTALL;
 
     int status = 0;
     if ((status = check_previous_install()) > 0)

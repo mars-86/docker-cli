@@ -31,7 +31,7 @@ void get_fs(void)
 {
     char full_path[512];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
-    sprintf(full_path, "%s/%s", getenv("TMP"), file_name);
+    sprintf(full_path, "%s\\%s", getenv("TMP"), file_name);
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     CURL *curl = curl_easy_init();
@@ -47,6 +47,7 @@ void get_fs(void)
         if (res == 0) {
             FILE *f = fopen(full_path, "wb");
             int i = 0;
+            printf("Saving filesystem in %s...\n", full_path);
             while (i < chunk.size)
                 fputc(chunk.response[i++], f);
             fclose(f);

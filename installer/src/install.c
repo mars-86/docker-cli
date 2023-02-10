@@ -11,6 +11,17 @@ static int env_exist(const char *name)
     return !status ? 1 : 0;
 }
 
+static int edit_dns(void)
+{
+    int status = 0;
+    status = system("wsl -d docker-cli rm resolv.conf");
+    status = system("wsl -d docker-cli echo \"[network]\" > /etc/wsl.conf");
+    status = system("wsl -d docker-cli echo \"generateResolvConf = false\" >> /etc/wsl.conf");
+    status = system("wsl -d docker-cli echo \"nameserver 8.8.8.8\" > /etc/resolv.conf");
+
+    return status;
+}
+
 void show_banner(void)
 {
     printf(
@@ -66,6 +77,9 @@ int install(const char *base_path)
 #endif
     if (system(ifs_cmd) < 0)
         return ECANNOTIFS;
+    
+    edit_dns();
+    system("wsl -t docker-cli");
 
     const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc";
     if (system(idocker_cmd) < 0)

@@ -37,7 +37,10 @@ void get_fs(void)
     CURL *curl = curl_easy_init();
     if (curl) {
         CURLcode res;
+        char errbuff[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_URL, FS_URL);
+        curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuff);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
@@ -51,6 +54,8 @@ void get_fs(void)
             while (i < chunk.size)
                 fputc(chunk.response[i++], f);
             fclose(f);
+        } else {
+            printf("%s\n", errbuff);
         }
         free(chunk.response);
     }

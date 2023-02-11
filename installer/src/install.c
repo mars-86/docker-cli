@@ -108,14 +108,14 @@ int add_to_path(void)
     return EOK;
 }
 
-int cp_bin_cli(const char *base_path)
+int copy_bin_cli(const char *base_path)
 {
     char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin ", base_path, "\\docker-cli");
     system(cp_cmd);
 }
 
-int cp_daemon(const char *base_path)
+int copy_daemon(const char *base_path)
 {
     char mkdir_cmd[512], cp_cmd[512];
     sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
@@ -145,8 +145,10 @@ int start_on_boot(void)
 int create_docker_service(void)
 {
     SC_HANDLE mngrh;
-    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE)))
+    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE))) {
+        printf("SC_HANDLE = NULL\n");
         return ESYSTEM;
+    }
 
     char dockerd_path[MAX_PATH];
     sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
@@ -165,6 +167,9 @@ int create_docker_service(void)
         NULL,
         NULL
     ))
+        return ESYSTEM;
+    
+    if (!CloseServiceHandle(mngrh))
         return ESYSTEM;
 
     return EOK;

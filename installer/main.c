@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
         return ECANCELEDINSTALL;
 
     int status = 0;
+/*
     if (status = check_previous_install())
         return status;
 
@@ -29,20 +30,26 @@ int main(int argc, char *argv[])
         return status;
     
     printf("Copying bin...\n");
-    if (status = cp_bin_cli(getenv("USERPROFILE")))
+    if (status = copy_bin_cli(getenv("USERPROFILE")))
         return status;
 
     printf("Copying daemon...\n");
-    if (status = cp_daemon(getenv("USERPROFILE")))
+    if (status = copy_daemon(getenv("USERPROFILE")))
         return status;
     
     printf("Adding docker to path...\n");
     if (status = add_to_path())
         return status;
+*/
+    printf("Creating docker service...\n");
+    if (status = create_docker_service())
+        return status;
 
+/*
     printf("Adding dockerd to run on boot...\n");
     if (status = start_on_boot())
         return status;
+*/
 
     return status;
 }

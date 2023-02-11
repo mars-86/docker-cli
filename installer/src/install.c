@@ -63,7 +63,7 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    char fs_path[512], install_path[512], ifs_cmd[512];
+    char fs_path[MAX_PATH], install_path[MAX_PATH], ifs_cmd[MAX_PATH];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
     sprintf(install_path, "%s\\docker-cli", base_path);
@@ -83,14 +83,14 @@ int install(const char *base_path)
     if (system(idocker_cmd) < 0)
         return ECANNOTIDOCK;
 
-    return 0;
+    return EOK;
 }
 
 int add_to_path(void)
 {
     HKEY hkey;
     DWORD len;
-    char docker_path[512], *newpathval, dockbpath[512];
+    char docker_path[MAX_PATH], *newpathval, dockbpath[MAX_PATH];
     const char *dockhvname = "DOCKER_CLI_HOME";
     if (!env_exist(dockhvname, env_skey)) {
         sprintf(docker_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli");
@@ -105,7 +105,7 @@ int add_to_path(void)
         RegSetValueExA(hkey, "Path", 0, REG_EXPAND_SZ, newpathval, strlen(newpathval));
         free(newpathval);
     }
-    return 0;
+    return EOK;
 }
 
 int cp_bin_cli(const char *base_path)
@@ -132,12 +132,40 @@ int start_on_boot(void)
 {
     HKEY hkey;
     DWORD len;
-    char dockerd_path[512];
+    char dockerd_path[MAX_PATH];
     const char *dockdvname = "Dockerd";
     if (!env_exist(dockdvname, run_skey)) {
         sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
         RegSetValueExA(hkey, dockdvname, 0, REG_SZ, dockerd_path, strlen(dockerd_path));
     }
-    return 0;
+    return EOK;
+}
+
+int create_docker_service(void)
+{
+    SC_HANDLE mngrh;
+    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE)))
+        return ESYSTEM;
+
+    char dockerd_path[MAX_PATH];
+    sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
+    if (!CreateServiceA(
+        mngrh,
+        "Docker cli",
+        "Docker command line interface",
+        SERVICE_START | SERVICE_STOP | SERVICE_PAUSE_CONTINUE | DELETE,
+        SERVICE_WIN32_OWN_PROCESS,
+        SERVICE_AUTO_START,
+        SERVICE_ERROR_NORMAL,
+        dockerd_path,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    ))
+        return ESYSTEM;
+
+    return EOK;
 }

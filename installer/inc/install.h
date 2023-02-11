@@ -6,5 +6,7 @@ int check_previous_install(void);
 int install(const char *base_path);
 int add_to_path(void);
 int cp_bin_cli(const char *base_path);
+int cp_daemon(const char *base_path);
+int start_on_boot(void);
 
 #endif // __DOCKER_CLI_INSTALL_INCLUDED_H__

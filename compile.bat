@@ -16,6 +16,10 @@ cd cli
 make install
 cd ..
 
+echo @ECHO off > install.bat
+echo cd .\setup\bin >> install.bat
+echo .\setup >> install.bat
+
 ECHO ====================
 ECHO Compilation complete
 ECHO ====================

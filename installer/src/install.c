@@ -5,19 +5,20 @@
 #include "../inc/install.h"
 #include "../../constants/inc/error_codes.h"
 
+static const LPCSTR skey = "Environment";
+
 static int env_exist(const char *name)
 {
-    int status = RegGetValueA(HKEY_CURRENT_USER, "Environment", name, RRF_RT_ANY, NULL, NULL, NULL);
+    int status = RegGetValueA(HKEY_CURRENT_USER, skey, name, RRF_RT_ANY, NULL, NULL, NULL);
     return !status ? 1 : 0;
 }
 
 static int edit_dns(void)
 {
     int status = 0;
-    status = system("wsl -d docker-cli rm resolv.conf");
-    status = system("wsl -d docker-cli echo \"[network]\" > /etc/wsl.conf");
-    status = system("wsl -d docker-cli echo \"generateResolvConf = false\" >> /etc/wsl.conf");
-    status = system("wsl -d docker-cli echo \"nameserver 8.8.8.8\" > /etc/resolv.conf");
+    status = system("wsl -d docker-cli rm /etc/resolv.conf");
+    status = system("wsl -d docker-cli -- cp ../../conf/wsl.conf /etc");
+    status = system("wsl -d docker-cli chmod 644 /etc/wsl.conf");
 
     return status;
 }
@@ -91,7 +92,6 @@ int install(const char *base_path)
 int add_to_path(void)
 {
     HKEY hkey;
-    LPCSTR skey = "Environment";
     DWORD len;
     char docker_path[512], *newpathval, dockbpath[512];
     const char *dockhvname = "DOCKER_CLI_HOME";
@@ -114,6 +114,6 @@ int add_to_path(void)
 int cp_bin_cli(const char *base_path)
 {
     char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r .\\cli\\bin ", base_path, "\\docker-cli");
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin ", base_path, "\\docker-cli");
     system(cp_cmd);
 }

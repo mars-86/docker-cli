@@ -4,7 +4,7 @@ MAIN=./
 CC=gcc
 CFLAGS=-I $(IDIR)
 
-OUTDIR=..
+OUTDIR=bin
 ODIR=obj
 LDIR =../lib
 
@@ -20,7 +20,10 @@ $(ODIR)/%.o: $(MAIN)/%.c $(DEPS)
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-install: $(ODIR) $(OUTDIR)/setup
+install: $(OUTDIR) $(ODIR) $(OUTDIR)/setup
+
+$(OUTDIR):
+	mkdir $@
 
 $(ODIR):
 	mkdir $@

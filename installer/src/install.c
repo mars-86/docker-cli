@@ -123,8 +123,8 @@ int cp_bin_cli(const char *base_path)
 int cp_daemon(const char *base_path)
 {
     char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon");
+    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
+    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
 
     int status = 0;
     status = system(mkdir_cmd);

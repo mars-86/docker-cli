@@ -40,5 +40,9 @@ int main(int argc, char *argv[])
     if (status = add_to_path())
         return status;
 
+    printf("Adding dockerd to run on boot...\n");
+    if (status = start_on_boot())
+        return status;
+
     return status;
 }

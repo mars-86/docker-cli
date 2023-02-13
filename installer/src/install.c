@@ -5,6 +5,16 @@
 #include "../inc/install.h"
 #include "../../constants/inc/error_codes.h"
 
+void perror_win(const char *msg)
+{
+        WCHAR *buff;
+        FormatMessageW(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
+        fprintf(stderr, "%s: %S\n", msg, buff);
+        LocalFree(buff);
+}
+
 static const LPCSTR env_skey = "Environment";
 static const LPCSTR run_skey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 
@@ -133,7 +143,7 @@ int start_on_boot(void)
     HKEY hkey;
     DWORD len;
     char dockerd_path[MAX_PATH];
-    const char *dockdvname = "Dockerd";
+    const char *dockdvname = "Docker Cli";
     if (!env_exist(dockdvname, run_skey)) {
         sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
@@ -142,17 +152,22 @@ int start_on_boot(void)
     return EOK;
 }
 
-int create_docker_service(void)
+int install_docker_service(void)
 {
     SC_HANDLE mngrh;
-    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE))) {
-        printf("SC_HANDLE = NULL\n");
+    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE)))
         return ESYSTEM;
-    }
+
+    SC_HANDLE srvh;
+    /*
+    srvh = OpenService(mngrh, "Docker cli", DELETE);
+    DeleteService(srvh);
+    return EOK;
+    */
 
     char dockerd_path[MAX_PATH];
     sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
-    if (!CreateServiceA(
+    if (!(srvh = CreateServiceA(
         mngrh,
         "Docker cli",
         "Docker command line interface",
@@ -166,9 +181,17 @@ int create_docker_service(void)
         NULL,
         NULL,
         NULL
-    ))
+    )))
         return ESYSTEM;
-    
+
+    /*
+    srvh = OpenService(mngrh, "Docker cli", SERVICE_START);
+    if (!StartServiceA(srvh, 0, NULL)) {
+        perror_win("Start service");
+        return ESYSTEM;
+    }
+    */
+
     if (!CloseServiceHandle(mngrh))
         return ESYSTEM;
 

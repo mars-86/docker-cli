@@ -8,6 +8,8 @@ OUTDIR=bin
 ODIR=obj
 LDIR=lib
 
+# LIBS=-lws2_32
+
 _DEPS = init.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 

@@ -19,6 +19,7 @@ cd ..
 echo @ECHO off > install.bat
 echo cd .\setup\bin >> install.bat
 echo .\setup >> install.bat
+echo cd ..\.. >> install.bat
 
 ECHO ====================
 ECHO Compilation complete

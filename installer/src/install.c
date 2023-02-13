@@ -5,6 +5,16 @@
 #include "../inc/install.h"
 #include "../../constants/inc/error_codes.h"
 
+void perror_win(const char *msg)
+{
+        WCHAR *buff;
+        FormatMessageW(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
+        fprintf(stderr, "%s: %S\n", msg, buff);
+        LocalFree(buff);
+}
+
 static const LPCSTR env_skey = "Environment";
 static const LPCSTR run_skey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 
@@ -63,7 +73,7 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    char fs_path[512], install_path[512], ifs_cmd[512];
+    char fs_path[MAX_PATH], install_path[MAX_PATH], ifs_cmd[MAX_PATH];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
     sprintf(install_path, "%s\\docker-cli", base_path);
@@ -83,14 +93,14 @@ int install(const char *base_path)
     if (system(idocker_cmd) < 0)
         return ECANNOTIDOCK;
 
-    return 0;
+    return EOK;
 }
 
 int add_to_path(void)
 {
     HKEY hkey;
     DWORD len;
-    char docker_path[512], *newpathval, dockbpath[512];
+    char docker_path[MAX_PATH], *newpathval, dockbpath[MAX_PATH];
     const char *dockhvname = "DOCKER_CLI_HOME";
     if (!env_exist(dockhvname, env_skey)) {
         sprintf(docker_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli");
@@ -105,17 +115,17 @@ int add_to_path(void)
         RegSetValueExA(hkey, "Path", 0, REG_EXPAND_SZ, newpathval, strlen(newpathval));
         free(newpathval);
     }
-    return 0;
+    return EOK;
 }
 
-int cp_bin_cli(const char *base_path)
+int copy_bin_cli(const char *base_path)
 {
     char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin ", base_path, "\\docker-cli");
     system(cp_cmd);
 }
 
-int cp_daemon(const char *base_path)
+int copy_daemon(const char *base_path)
 {
     char mkdir_cmd[512], cp_cmd[512];
     sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
@@ -132,12 +142,58 @@ int start_on_boot(void)
 {
     HKEY hkey;
     DWORD len;
-    char dockerd_path[512];
-    const char *dockdvname = "Dockerd";
+    char dockerd_path[MAX_PATH];
+    const char *dockdvname = "Docker Cli";
     if (!env_exist(dockdvname, run_skey)) {
         sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
         RegSetValueExA(hkey, dockdvname, 0, REG_SZ, dockerd_path, strlen(dockerd_path));
     }
-    return 0;
+    return EOK;
+}
+
+int install_docker_service(void)
+{
+    SC_HANDLE mngrh;
+    if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE)))
+        return ESYSTEM;
+
+    SC_HANDLE srvh;
+    /*
+    srvh = OpenService(mngrh, "Docker cli", DELETE);
+    DeleteService(srvh);
+    return EOK;
+    */
+
+    char dockerd_path[MAX_PATH];
+    sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
+    if (!(srvh = CreateServiceA(
+        mngrh,
+        "Docker cli",
+        "Docker command line interface",
+        SERVICE_START | SERVICE_STOP | SERVICE_PAUSE_CONTINUE | DELETE,
+        SERVICE_WIN32_OWN_PROCESS,
+        SERVICE_AUTO_START,
+        SERVICE_ERROR_NORMAL,
+        dockerd_path,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+    )))
+        return ESYSTEM;
+
+    /*
+    srvh = OpenService(mngrh, "Docker cli", SERVICE_START);
+    if (!StartServiceA(srvh, 0, NULL)) {
+        perror_win("Start service");
+        return ESYSTEM;
+    }
+    */
+
+    if (!CloseServiceHandle(mngrh))
+        return ESYSTEM;
+
+    return EOK;
 }

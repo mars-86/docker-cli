@@ -8,7 +8,7 @@ OUTDIR=bin
 ODIR=obj
 LDIR=lib
 
-LIBS=-lcurl
+LIBS=-lcurl -lws2_32
 
 _DEPS = finish.h fs.h install.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

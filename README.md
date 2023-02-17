@@ -17,11 +17,11 @@ You will need to install mingw if you download the docker-cli version without li
 
 #### Install docker CLI
 Just run install.bat and it will install docker cli on user's root folder
-![Docker CLI for Windows]https://github.com/mars-86/static-assets/raw/main/images/docker-cli/docker-cli-002.jpg
+![Docker CLI for Windows](https://github.com/mars-86/static-assets/raw/main/images/docker-cli/docker-cli-002.jpg)
 
 ## Usage
-Run docker command from console
-![Docker CLI for Windows]https://github.com/mars-86/static-assets/raw/main/images/docker-cli/docker-cli-001.jpg
+Run docker command from console.
+![Docker CLI for Windows](https://github.com/mars-86/static-assets/raw/main/images/docker-cli/docker-cli-001.jpg)
 
 ## Building for source
 - Install mingw https://www.mingw-w64.org/
@@ -36,9 +36,9 @@ You may have problems due to antivirus, specifically McAfee.
 
 ### Troubleshooting
 - The operation could not be started because a required feature is not installed.
-    -> enable virtual machine platform (intallation prerequisites)
+    -> enable virtual machine platform (intallation prerequisites).
 - Daemon does not starts on init
-    -> go to %USERPROFILE%\docker-cli\daemon\ and run dockerd.exe manually
+    -> go to %USERPROFILE%\docker-cli\daemon\ and run dockerd.exe manually.
 
 ## License
 MIT

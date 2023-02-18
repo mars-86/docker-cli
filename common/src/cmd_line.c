@@ -11,23 +11,31 @@ int exec(const char *cmd)
 
 const char *parse_cmdl(const char *base, const char **argv)
 {
-    char *__cmd;
-    size_t __bytes = strlen(base);
+    char *cmd;
+    size_t bytes = strlen(base);
 
-    __cmd = (char *)malloc(__bytes * sizeof(char));
-    if (__cmd == NULL)
+    cmd = (char *)malloc(bytes * sizeof(char));
+    if (cmd == NULL)
         return NULL;
 
-    memcpy(__cmd, base, __bytes);
+    memcpy(cmd, base, bytes);
     while (*argv != NULL) {
-        size_t arglen = strlen(*argv), nsize = __bytes + arglen + 1;
-        __cmd = (char *)realloc(__cmd, nsize * sizeof(char));
-        __cmd[__bytes] = ' ';
-        memcpy(&__cmd[__bytes + 1], *argv++, arglen);
-        __bytes = nsize;
+        size_t arglen = strlen(*argv), nsize = bytes + arglen + 1;
+        cmd = (char *)realloc(cmd, nsize * sizeof(char));
+        cmd[bytes] = ' ';
+        memcpy(&cmd[bytes + 1], *argv++, arglen);
+        bytes = nsize;
     }
-    __cmd = (char *)realloc(__cmd, (__bytes + 1) * sizeof(char));
-    __cmd[__bytes] = '\0';
+    cmd = (char *)realloc(cmd, (bytes + 1) * sizeof(char));
+    cmd[bytes] = '\0';
 
-    return __cmd;
+#ifdef __DEBUG
+    printf("%s\n", cmd);
+#endif
+    return cmd;
+}
+
+void free_cmdl(void *cmd)
+{
+    free(cmd);
 }

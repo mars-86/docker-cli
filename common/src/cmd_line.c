@@ -1,24 +1,33 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+int exec(const char *cmd)
+{
+#ifdef __DEBUG
+    printf("%s\n", cmd);
+#endif
+    return system(cmd);
+}
 
 const char *parse_cmdl(const char *base, const char **argv)
 {
-    char *cmd;
-    size_t bytes = strlen(base);
+    char *__cmd;
+    size_t __bytes = strlen(base);
 
-    cmd = (char *)malloc(bytes * sizeof(char));
-    if (cmd == NULL)
+    __cmd = (char *)malloc(__bytes * sizeof(char));
+    if (__cmd == NULL)
         return NULL;
 
-    memcpy(cmd, base, bytes);
+    memcpy(__cmd, base, __bytes);
     while (*argv != NULL) {
-        size_t arglen = strlen(*argv), nsize = bytes + arglen + 1;
-        cmd = (char *)realloc(cmd, nsize * sizeof(char));
-        cmd[bytes] = ' ';
-        memcpy(&cmd[bytes + 1], *argv++, arglen);
-        bytes = nsize;
+        size_t arglen = strlen(*argv), nsize = __bytes + arglen + 1;
+        __cmd = (char *)realloc(__cmd, nsize * sizeof(char));
+        __cmd[__bytes] = ' ';
+        memcpy(&__cmd[__bytes + 1], *argv++, arglen);
+        __bytes = nsize;
     }
-    cmd = (char *)realloc(cmd, (bytes + 1) * sizeof(char));
-    cmd[bytes] = '\0';
+    __cmd = (char *)realloc(__cmd, (__bytes + 1) * sizeof(char));
+    __cmd[__bytes] = '\0';
 
-    return cmd;
+    return __cmd;
 }

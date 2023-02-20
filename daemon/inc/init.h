@@ -4,6 +4,6 @@
 #include <pthread.h>
 
 void show_banner(void);
-void init_dockerd(pthread_t *tid);
+void init_dockerd(pthread_t *tid, void *cmd);
 
 #endif // __DOCKER_DAEMON_INIT_INCLUDED_H__

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../common/common.h"
 
-#define BASE_CMD "wsl -d docker-cli -- docker"
+#define BASE_CMD "wsl -d docker-cli --"
 #define HELP_CMD "wsl -d docker-cli -- docker --help"
 
 int main(int argc, char *argv[])
@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
         exec(HELP_CMD);
         return 1;
     }
-    const char *cmd = parse_cmdl(BASE_CMD, (const char **)(argv + 1));
+    const char *cmd = parse_cmdl(BASE_CMD, (const char **)argv);
 
     exec(cmd);
     free_cmdl(cmd);

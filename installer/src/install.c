@@ -73,18 +73,26 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    char fs_path[MAX_PATH], install_path[MAX_PATH], ifs_cmd[MAX_PATH];
+    char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[MAX_PATH], idt_cmd[MAX_PATH];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
     sprintf(install_path, "%s\\docker-cli", base_path);
+    sprintf(install_data_path, "%s\\docker-cli\\data", base_path);
     sprintf(ifs_cmd, "wsl --import docker-cli %s %s", install_path, fs_path);
+    sprintf(idt_cmd, "wsl --import docker-cli-data %s %s", install_data_path, fs_path);
 
 #ifdef __DEBUG
     printf("%s\n", ifs_cmd);
 #endif
     if (system(ifs_cmd) < 0)
         return ECANNOTIFS;
-    
+
+/*
+    TODO: save docker data to another partition
+    if (system(idt_cmd) < 0)
+        return ECANNOTIFS;
+*/
+
     edit_dns();
     /* terminate vm to set changes */
     system("wsl -t docker-cli");

@@ -1,5 +1,9 @@
 <h1 align="center">Docker CLI for Windows</h1>
 
+## Get docker cli
+At the moment the docker cli to download is a beta version  
+You can download it from releases page https://github.com/mars-86/docker-cli/releases
+
 ## Overview
 Use docker on windows from command line.
 
@@ -35,9 +39,9 @@ It should generate a bin folder with an executable file inside every module and 
 You may have problems due to antivirus, specifically McAfee.
 
 ### Troubleshooting
-- The operation could not be started because a required feature is not installed.
-    -> enable virtual machine platform (intallation prerequisites).
-- Daemon does not starts on init
+- The operation could not be started because a required feature is not installed.  
+    -> enable virtual machine platform (https://github.com/mars-86/docker-cli/tree/refactor/readme.md#prerequisites).
+- Daemon does not starts on init or stops unexpectedly  
     -> go to %USERPROFILE%\docker-cli\daemon\ and run dockerd.exe manually.
 
 ## License

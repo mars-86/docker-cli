@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "../inc/init.h"
 
-static void *startup(void *args)
+static void *startup(void *cmd)
 {
-    system("wsl -d docker-cli -- dockerd");
+    exec(cmd);
     return NULL;
 }
 
@@ -19,8 +19,8 @@ void show_banner(void)
     );
 }
 
-void init_dockerd(pthread_t *tid)
+void init_dockerd(pthread_t *tid, void *cmd)
 {
-    pthread_create(tid, NULL, startup, NULL);
+    pthread_create(tid, NULL, startup, cmd);
     pthread_detach(*tid);
 }

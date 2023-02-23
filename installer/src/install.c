@@ -27,7 +27,7 @@ static int env_exist(const char *name, const char *skey)
 static int edit_dns(void)
 {
     int status = 0;
-    status = system("wsl -d docker-cli rm /etc/resolv.conf");
+    status = exec("wsl -d docker-cli rm /etc/resolv.conf");
     status = system("wsl -d docker-cli -- cp ../../conf/wsl.conf /etc");
     status = system("wsl -d docker-cli chmod 644 /etc/wsl.conf");
 

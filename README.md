@@ -41,7 +41,7 @@ You may have problems due to antivirus, specifically McAfee.
 ### Troubleshooting
 - The operation could not be started because a required feature is not installed.  
     -> enable virtual machine platform (https://github.com/mars-86/docker-cli/tree/refactor/readme.md#prerequisites).
-- Daemon does not starts on init  
+- Daemon does not starts on init or stops unexpectedly  
     -> go to %USERPROFILE%\docker-cli\daemon\ and run dockerd.exe manually.
 
 ## License

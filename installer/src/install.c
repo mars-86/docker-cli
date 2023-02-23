@@ -117,7 +117,8 @@ int add_to_path(void)
         RegGetValueA(HKEY_CURRENT_USER, env_skey, "Path", RRF_RT_ANY, NULL, NULL , &len);
         newpathval = (char *)malloc(len * sizeof(char));
         RegGetValueA(HKEY_CURRENT_USER, env_skey, "Path", RRF_RT_ANY | RRF_NOEXPAND, NULL, newpathval, &len);
-        sprintf(dockbpath, "%%%s%%\\bin;\0", dockhvname);
+        /* fix: had to use full path because REG_EXPAND_SZ did not work with DOCKER_CLI_HOME */
+        sprintf(dockbpath, "%%%s%%\\bin;\0", docker_path);
         newpathval = (char *)realloc(newpathval, (len + strlen(dockbpath)) * sizeof(char));
         memcpy(&newpathval[len - 1], dockbpath, strlen(dockbpath) + 1);
         RegSetValueExA(hkey, "Path", 0, REG_EXPAND_SZ, newpathval, strlen(newpathval));

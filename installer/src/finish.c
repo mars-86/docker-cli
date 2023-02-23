@@ -16,7 +16,7 @@ static void *start_daemon(void *args)
         printf("Error opening pipe\n");
 
     int ret = _pclose(pipe);
-    // system(".\\daemon\\dockerd");
+    // exec(".\\daemon\\dockerd");
     return NULL;
 }
 

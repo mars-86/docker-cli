@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "../inc/install.h"
 #include "../../constants/inc/error_codes.h"
+#include "../../common/common.h"
 
 void perror_win(const char *msg)
 {
@@ -27,9 +28,9 @@ static int env_exist(const char *name, const char *skey)
 static int edit_dns(void)
 {
     int status = 0;
-    status = system("wsl -d docker-cli rm /etc/resolv.conf");
-    status = system("wsl -d docker-cli -- cp ../../conf/wsl.conf /etc");
-    status = system("wsl -d docker-cli chmod 644 /etc/wsl.conf");
+    status = exec("wsl -d docker-cli rm /etc/resolv.conf");
+    status = exec("wsl -d docker-cli -- cp ../../conf/wsl.conf /etc");
+    status = exec("wsl -d docker-cli chmod 644 /etc/wsl.conf");
 
     return status;
 }
@@ -84,21 +85,21 @@ int install(const char *base_path)
 #ifdef __DEBUG
     printf("%s\n", ifs_cmd);
 #endif
-    if (system(ifs_cmd) < 0)
+    if (exec(ifs_cmd) < 0)
         return ECANNOTIFS;
 
 /*
     TODO: save docker data to another partition
-    if (system(idt_cmd) < 0)
+    if (exec(idt_cmd) < 0)
         return ECANNOTIFS;
 */
 
     edit_dns();
     /* terminate vm to set changes */
-    system("wsl -t docker-cli");
+    exec("wsl -t docker-cli");
 
     const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc";
-    if (system(idocker_cmd) < 0)
+    if (exec(idocker_cmd) < 0)
         return ECANNOTIDOCK;
 
     return EOK;
@@ -131,7 +132,7 @@ int copy_bin_cli(const char *base_path)
 {
     char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin ", base_path, "\\docker-cli");
-    system(cp_cmd);
+    exec(cp_cmd);
 }
 
 int copy_daemon(const char *base_path)
@@ -141,8 +142,8 @@ int copy_daemon(const char *base_path)
     sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
 
     int status = 0;
-    status = system(mkdir_cmd);
-    status = system(cp_cmd);
+    status = exec(mkdir_cmd);
+    status = exec(cp_cmd);
 
     return status;
 }

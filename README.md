@@ -1,5 +1,9 @@
 <h1 align="center">Docker CLI for Windows</h1>
 
+## Get docker cli
+Actually the docker cli to download is a beta version
+You can download it from releases page https://github.com/mars-86/docker-cli/releases
+
 ## Overview
 Use docker on windows from command line.
 

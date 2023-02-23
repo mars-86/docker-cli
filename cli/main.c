@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     const char *cmd = parse_cmdl(BASE_CMD, (const char **)argv);
 
     exec(cmd);
-    free_cmdl(cmd);
+    free_cmdl((char *)cmd);
 
     return 0;
 }

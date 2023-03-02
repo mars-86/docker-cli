@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "../inc/init.h"
+#include "../../common/common.h"
 
 static void *startup(void *cmd)
 {

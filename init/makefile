@@ -1,8 +1,8 @@
-IDIR=installer/inc
-SDIR=installer/src
+IDIR=inc
+SDIR=src
 EXIDIR=../common
 EXSDIR=../common/src
-MAIN=./
+MAINDIR=./
 CC=gcc
 CFLAGS=-I $(IDIR)
 
@@ -12,13 +12,13 @@ LDIR =../lib
 
 LIBS=-lws2_32
 
-_DEPS =
+_DEPS = gui.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o
+_OBJ = main.o gui.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-$(ODIR)/%.o: $(MAIN)/%.c $(DEPS)
+$(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)

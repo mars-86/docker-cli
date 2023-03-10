@@ -4,7 +4,7 @@
 #include "../inc/process.h"
 #include "../../constants/inc/error_codes.h"
 
-void perror_win(const char *msg)
+void perror_win2(const char *msg)
 {
         WCHAR *buff;
         FormatMessageW(
@@ -32,7 +32,7 @@ int init_daemon(const char *path, char *args)
         NULL,
         NULL,
         0,
-        NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE,
+        NORMAL_PRIORITY_CLASS | DETACHED_PROCESS,
         NULL,
         NULL,
         &sinfo,
@@ -40,7 +40,7 @@ int init_daemon(const char *path, char *args)
     );
 
     if (!status) {
-        perror_win("Create Process");
+        perror_win2("Create Process");
         return ESYSTEM;
     }
 

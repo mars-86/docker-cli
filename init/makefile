@@ -15,7 +15,7 @@ LIBS=-lws2_32
 _DEPS = gui.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o gui.o
+_OBJ = main.o gui.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)

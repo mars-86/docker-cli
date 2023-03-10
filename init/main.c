@@ -91,7 +91,11 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     }
 
     Sleep(1000);
-    init_daemon("..\\..\\daemon\\bin", NULL);
+    char daemon_path[MAX_PATH];
+    const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
+    sprintf(daemon_path, "%s\\daemon", docker_cli_home);
+    
+    init_daemon(daemon_path, NULL);
     // ShowWindow(hwnd, n_show_cmd);
 
     Sleep(1000);

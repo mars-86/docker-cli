@@ -4,6 +4,8 @@
 #include "../constants/inc/error_msgs.h"
 #include "../common/common.h"
 
+#define DOCKER_CLI_HOME_VAR_NAME "DOCKER_CLI_HOME"
+
 int main(int argc, char *argv[])
 {
     int status = 0;
@@ -12,7 +14,11 @@ int main(int argc, char *argv[])
         return status;
     }
 
-    if ((status = exec("..\\..\\init\\bin\\docker-cli")) > 0) {
+    char docker_cli_path[MAX_PATH];
+    const char *docker_cli_home_path = getenv(DOCKER_CLI_HOME_VAR_NAME);
+    sprintf(docker_cli_path, "%s\\bin\\docker-cli", docker_cli_home_path);
+
+    if ((status = exec(docker_cli_path)) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);
         return status;
     }

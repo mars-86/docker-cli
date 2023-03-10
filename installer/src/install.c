@@ -164,7 +164,7 @@ int start_on_boot(void)
     char dockerd_path[MAX_PATH];
     const char *dockdvname = "Docker Cli";
     if (!env_exist(dockdvname, run_skey)) {
-        sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\daemon\\dockerd");
+        sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\bin\\docker-cli");
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
         RegSetValueExA(hkey, dockdvname, 0, REG_SZ, dockerd_path, strlen(dockerd_path));
     }

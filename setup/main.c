@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
         return status;
     }
 
-    if ((status = exec("..\\..\\daemon\\bin\\dockerd")) > 0) {
+    if ((status = exec("..\\..\\init\\bin\\docker-cli")) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);
         return status;
     }

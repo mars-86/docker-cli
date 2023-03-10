@@ -128,10 +128,11 @@ int add_to_path(void)
     return EOK;
 }
 
-int copy_bin_cli(const char *base_path)
+int copy_docker(const char *base_path)
 {
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin ", base_path, "\\docker-cli");
+    char mkdir_cmd[512], cp_cmd[512];
+    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\docker");
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\docker\\");
     exec(cp_cmd);
 }
 
@@ -146,6 +147,14 @@ int copy_daemon(const char *base_path)
     status = exec(cp_cmd);
 
     return status;
+}
+
+int copy_bin_cli(const char *base_path)
+{
+    char mkdir_cmd[512], cp_cmd[512];
+    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\bin");
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
+    exec(cp_cmd);
 }
 
 int start_on_boot(void)

@@ -29,12 +29,16 @@ int main(int argc, char *argv[])
     if (status = install(getenv("USERPROFILE")))
         return status;
     
-    printf("Copying bin...\n");
-    if (status = copy_bin_cli(getenv("USERPROFILE")))
+    printf("Copying docker...\n");
+    if (status = copy_docker(getenv("USERPROFILE")))
         return status;
 
     printf("Copying daemon...\n");
     if (status = copy_daemon(getenv("USERPROFILE")))
+        return status;
+    
+    printf("Copying bin...\n");
+    if (status = copy_bin_cli(getenv("USERPROFILE")))
         return status;
     
     printf("Adding docker to path...\n");

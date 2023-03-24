@@ -42,49 +42,30 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     printf("%d\n", status);
 #endif
 
-    HICON ico;
-    ico = load_icon(NULL, "..\\settings.ico");
+    char docker_path[MAX_PATH], icon_path[MAX_PATH];
+    sprintf(docker_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli");
 
-    if (!ico)
-        printf("ERROR");
+    int status = create_tray_icon(hwnd);
 
-    NOTIFYICONDATA nicon;
-    nicon.cbSize = sizeof(nicon);
-    nicon.hWnd = hwnd;
-    nicon.uID = 123456781;
-    // nicon.uFlags = NIF_GUID;
-    nicon.hIcon = ico;
-    strcpy(nicon.szTip, "Docker CLI");
-    nicon.dwState = NIS_SHAREDICON;
-    nicon.uCallbackMessage =  (UINT)WM_NOTIFYCALLBACK;
-    strcpy(nicon.szInfo, "Docker CLI is starting...");
-    strcpy(nicon.szInfoTitle, "Docker CLI");
-    nicon.dwInfoFlags = NIIF_INFO;
-    // nicon.guidItem = (GUID){{0xE0, 0x39, 0xD0, 0x38}, {0xD9, 0xF3}, {0x43, 0x2B}, {"97020e27"}};
-
-    WINBOOL status = Shell_NotifyIconA(NIM_ADD, &nicon);
-    if (!status)
-        printf("ERROR");
-
-    nicon.uVersion = NOTIFYICON_VERSION_4;
-    Shell_NotifyIconA(NIM_SETVERSION, &nicon);
-    // WINBOOL status = create_tray_icon(hwnd);
-
-    if (!status) {
-        perror_win("Notify ICON");
-        system("PAUSE");
-        return ESYSTEM;
+    if (status != EOK) {
+        perror_win("Create tray icon");
+        return status;
     }
 
     /* we sleep one second so we give time to load resources, if we don't we get a random behavior */
     Sleep(1000);
+
     HWND cwin = GetConsoleWindow();
 
     BOOL close_status = CloseWindow(cwin);
     if (!close_status) {
         perror_win("Close Window");
     }
+
+#ifndef __DEBUG
     FreeConsole();
+#endif
+
     BOOL destroy_status = DestroyWindow(cwin);
     if (!destroy_status) {
         perror_win("Destroy Window");
@@ -92,13 +73,12 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     Sleep(1000);
     char daemon_path[MAX_PATH];
-    const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
-    sprintf(daemon_path, "%s\\daemon", docker_cli_home);
-    
-    init_daemon(daemon_path, NULL);
-    // ShowWindow(hwnd, n_show_cmd);
+    // const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
+    sprintf(daemon_path, "%s\\daemon", docker_path);
 
+    init_daemon(daemon_path, NULL);
     Sleep(1000);
+
     // Run the message loop.
     MSG msg = {};
     BOOL bRet;
@@ -123,19 +103,20 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
 {
     switch (u_msg) {
     case WM_CREATE:
+        // here should be the initialization process
         break;
     case WM_NOTIFYCALLBACK:
-        switch (LOWORD(l_param))
-        {
-        case 515:
-            printf("DOUBLE CLICK");
+        switch (LOWORD(l_param)) {
+        case WM_LBUTTONDBLCLK:
             // ShowWindow(hwnd, SW_SHOW);
             break;
-        case WM_MOUSEFIRST:
-            printf("MOUSE FIRST");
+        case WM_CONTEXTMENU:
             break;
         default:
-            printf("Event\n");
+#ifdef __DEBUG
+            printf("X %d\n", LOWORD(w_param));
+            printf("Event %d\n", LOWORD(l_param));
+#endif
         }
         break;
     case WM_DESTROY:

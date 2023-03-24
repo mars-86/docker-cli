@@ -112,14 +112,14 @@ int add_to_path(void)
     char docker_path[MAX_PATH], *newpathval, dockbpath[MAX_PATH];
     const char *dockhvname = "DOCKER_CLI_HOME";
     if (!env_exist(dockhvname, env_skey)) {
-        sprintf(docker_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli");
+        sprintf(docker_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli");
         RegOpenKeyExA(HKEY_CURRENT_USER, env_skey, 0, KEY_SET_VALUE , &hkey);
         RegSetValueExA(hkey, dockhvname, 0, REG_EXPAND_SZ, docker_path, strlen(docker_path));
         RegGetValueA(HKEY_CURRENT_USER, env_skey, "Path", RRF_RT_ANY, NULL, NULL , &len);
         newpathval = (char *)malloc(len * sizeof(char));
         RegGetValueA(HKEY_CURRENT_USER, env_skey, "Path", RRF_RT_ANY | RRF_NOEXPAND, NULL, newpathval, &len);
         /* fix: had to use full path because REG_EXPAND_SZ did not work with DOCKER_CLI_HOME */
-        sprintf(dockbpath, "%s\\bin;\0", docker_path);
+        sprintf(dockbpath, "%s\\cli;", docker_path);
         newpathval = (char *)realloc(newpathval, (len + strlen(dockbpath)) * sizeof(char));
         memcpy(&newpathval[len - 1], dockbpath, strlen(dockbpath) + 1);
         RegSetValueExA(hkey, "Path", 0, REG_EXPAND_SZ, newpathval, strlen(newpathval));
@@ -131,9 +131,14 @@ int add_to_path(void)
 int copy_docker(const char *base_path)
 {
     char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\docker");
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\docker\\");
-    exec(cp_cmd);
+    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\bin");
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
+
+    int status = 0;
+    status = exec(mkdir_cmd);
+    status = exec(cp_cmd);
+
+    return status;
 }
 
 int copy_daemon(const char *base_path)
@@ -152,21 +157,26 @@ int copy_daemon(const char *base_path)
 int copy_bin_cli(const char *base_path)
 {
     char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\bin");
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
-    exec(cp_cmd);
+    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\cli");
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
+    
+    int status = 0;
+    status = exec(mkdir_cmd);
+    status = exec(cp_cmd);
+
+    return status;
 }
 
 int start_on_boot(void)
 {
     HKEY hkey;
     DWORD len;
-    char dockerd_path[MAX_PATH];
+    char docker_cli_path[MAX_PATH];
     const char *dockdvname = "Docker Cli";
     if (!env_exist(dockdvname, run_skey)) {
-        sprintf(dockerd_path, "%s%s\0", getenv("USERPROFILE"), "\\docker-cli\\bin\\docker-cli");
+        sprintf(docker_cli_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli\\bin\\docker-cli");
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
-        RegSetValueExA(hkey, dockdvname, 0, REG_SZ, dockerd_path, strlen(dockerd_path));
+        RegSetValueExA(hkey, dockdvname, 0, REG_SZ, docker_cli_path, strlen(docker_cli_path));
     }
     return EOK;
 }

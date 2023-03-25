@@ -2,12 +2,6 @@
 #include "../inc/init.h"
 #include "../../common/common.h"
 
-static void *startup(void *cmd)
-{
-    exec(cmd);
-    return NULL;
-}
-
 void show_banner(void)
 {
     printf(
@@ -20,8 +14,3 @@ void show_banner(void)
     );
 }
 
-void init_dockerd(pthread_t *tid, void *cmd)
-{
-    pthread_create(tid, NULL, startup, cmd);
-    pthread_detach(*tid);
-}

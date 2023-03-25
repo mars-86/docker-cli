@@ -43,6 +43,10 @@ int main(int argc, char *argv[])
     if (status = copy_bin_cli(user_path))
         return status;
     
+    printf("Copiying assets...\n");
+    if (status = copy_assets(user_path))
+        return status;
+
     printf("Adding docker to path...\n");
     if (status = add_to_path())
         return status;
@@ -56,7 +60,9 @@ int main(int argc, char *argv[])
     if (status = start_on_boot())
         return status;
 
+#ifdef __DEBUG
     printf("%d\n", status);
+#endif
 
     return status;
 }

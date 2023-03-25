@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     if (status = copy_bin_cli(user_path))
         return status;
     
-    printf("Copiying assets...\n");
+    printf("Copying assets...\n");
     if (status = copy_assets(user_path))
         return status;
 

@@ -16,6 +16,7 @@ void perror_win(const char *msg)
 #define UNICODE
 #endif
 
+HINSTANCE hinst;
 LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_param);
 
 int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd_line, int n_show_cmd)
@@ -31,6 +32,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     RegisterClass(&wc);
 
+    hinst = h_instance;
     HWND hwnd = create_main_window(CLASS_NAME, "Docker CLI", h_instance, NULL);
 
     if (hwnd == NULL)
@@ -99,6 +101,39 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     return msg.wParam;
 }
 
+void ShowContextMenu(HWND hwnd, POINT pt)
+{
+    HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(0));
+
+    if (!hMenu) {
+        perror_win("hmenu");
+    }
+
+    if (hMenu)
+    {
+        HMENU hSubMenu = GetSubMenu(hMenu, 0);
+        if (hSubMenu)
+        {
+            // our window must be foreground before calling TrackPopupMenu or the menu will not disappear when the user clicks away
+            SetForegroundWindow(hwnd);
+
+            // respect menu drop alignment
+            UINT uFlags = TPM_RIGHTBUTTON;
+            if (GetSystemMetrics(SM_MENUDROPALIGNMENT) != 0)
+            {
+                uFlags |= TPM_RIGHTALIGN;
+            }
+            else
+            {
+                uFlags |= TPM_LEFTALIGN;
+            }
+
+            TrackPopupMenuEx(hSubMenu, uFlags, pt.x, pt.y, hwnd, NULL);
+        }
+        DestroyMenu(hMenu);
+    }
+}
+
 LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
 {
     switch (u_msg) {
@@ -111,6 +146,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
             // ShowWindow(hwnd, SW_SHOW);
             break;
         case WM_CONTEXTMENU:
+            POINT pt = { LOWORD(w_param), HIWORD(w_param) };
+            ShowContextMenu(hwnd, pt);
             break;
         default:
 #ifdef __DEBUG

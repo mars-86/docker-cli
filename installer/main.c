@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     if (opt != 'Y')
         return ECANCELEDINSTALL;
 
-    int status = 0;
+    int status = EOK;
 
     if (status = check_previous_install())
         return status;
@@ -25,18 +25,28 @@ int main(int argc, char *argv[])
     printf("Getting file system...\n");
     get_fs();
 
+    const char *user_path = getenv("USERPROFILE");
+
     printf("Installing docker...\n");
-    if (status = install(getenv("USERPROFILE")))
+    if (status = install(user_path))
         return status;
     
-    printf("Copying bin...\n");
-    if (status = copy_bin_cli(getenv("USERPROFILE")))
+    printf("Copying docker...\n");
+    if (status = copy_docker(user_path))
         return status;
 
     printf("Copying daemon...\n");
-    if (status = copy_daemon(getenv("USERPROFILE")))
+    if (status = copy_daemon(user_path))
         return status;
     
+    printf("Copying bin...\n");
+    if (status = copy_bin_cli(user_path))
+        return status;
+    
+    printf("Copiying assets...\n");
+    if (status = copy_assets(user_path))
+        return status;
+
     printf("Adding docker to path...\n");
     if (status = add_to_path())
         return status;
@@ -46,9 +56,13 @@ int main(int argc, char *argv[])
         return status;
 */
 
-    printf("Adding dockerd to run on boot...\n");
+    printf("Adding docker to run on boot...\n");
     if (status = start_on_boot())
         return status;
+
+#ifdef __DEBUG
+    printf("%d\n", status);
+#endif
 
     return status;
 }

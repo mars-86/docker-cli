@@ -12,4 +12,6 @@ enum _ERROR_CODES {
     ESYSTEM = 99
 };
 
+typedef enum _ERROR_CODES ECODE;
+
 #endif // __DOCKER_CLI_CONSTANTS_ERROR_CODES_INCLUDED_H__

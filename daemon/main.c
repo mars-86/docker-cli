@@ -14,10 +14,11 @@ int main(int argc, char *argv[])
 
     const char *cmd = parse_cmdl(BASE_CMD, (const char **)(argv + 1));
 
-    pthread_t tid;
-    init_dockerd(&tid, (char *)cmd);
+    // pthread_t tid;
+    exec(cmd);
+    // init_dockerd(&tid, (char *)cmd);
     /* fix */
-    Sleep(5000);
+    // Sleep(5000);
 
     free_cmdl((char *)cmd);
 

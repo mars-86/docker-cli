@@ -14,7 +14,7 @@ void perror_win2(const char *msg)
         LocalFree(buff);
 }
 
-int init_daemon(const char *path, char *args)
+int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
 {
     STARTUPINFO sinfo;
     PROCESS_INFORMATION pinfo;
@@ -24,6 +24,8 @@ int init_daemon(const char *path, char *args)
     memset(&pinfo, 0, sizeof(pinfo));
 
     sinfo.cb = sizeof(sinfo);
+    // sinfo.dwFlags = STARTF_USESHOWWINDOW;
+    sinfo.wShowWindow = SW_HIDE;
 
     sprintf(daemon_path, "%s\\dockerd.exe", path);
     int status = CreateProcessA(
@@ -32,7 +34,7 @@ int init_daemon(const char *path, char *args)
         NULL,
         NULL,
         0,
-        NORMAL_PRIORITY_CLASS | DETACHED_PROCESS,
+        NORMAL_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP | CREATE_SUSPENDED,
         NULL,
         NULL,
         &sinfo,
@@ -44,8 +46,12 @@ int init_daemon(const char *path, char *args)
         return ESYSTEM;
     }
 
-    WaitForSingleObject(pinfo.hProcess, INFINITE);
+    printf("pinfo: %d\n", pinfo.dwProcessId);
+    *proc = pinfo;
+    // WaitForSingleObject(pinfo.hProcess, INFINITE);
 
-    CloseHandle(pinfo.hProcess);
-    CloseHandle(pinfo.hThread);
+    // CloseHandle(pinfo.hProcess);
+    // CloseHandle(pinfo.hThread);
+
+    return EOK;
 }

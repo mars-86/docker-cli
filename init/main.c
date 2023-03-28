@@ -74,13 +74,25 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     }
 
     Sleep(1000);
+
     char daemon_path[MAX_PATH];
     // const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
     sprintf(daemon_path, "%s\\daemon", docker_path);
 
-    init_daemon(daemon_path, NULL);
+    PROCESS_INFORMATION pinfo;
+    status = init_daemon(daemon_path, NULL, &pinfo);
+
+#ifdef __DEBUG
+    printf("Init daemon: %d\n", status);
+    printf("Process id: %d\n", pinfo.dwProcessId);
+#endif
+
+    ResumeThread(pinfo.hThread);
+    // system(daemon_path);
+    // printf("daemon running\n");
     Sleep(1000);
 
+    printf("dockerd running\n");
     // Run the message loop.
     MSG msg = {};
     BOOL bRet;

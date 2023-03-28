@@ -43,6 +43,8 @@ You may have problems due to antivirus, specifically McAfee.
     -> enable virtual machine platform (https://github.com/mars-86/docker-cli/tree/refactor/readme.md#prerequisites).
 - Daemon does not starts on init or stops unexpectedly  
     -> go to %USERPROFILE%\docker-cli\daemon\ and run dockerd.exe manually.
+- WSL stops instances after windows sleeps (https://github.com/microsoft/WSL/issues/8763)  
+    -> go to edit plan settings and change all the options in "choose what the power buttons do" to hibernate also go to "change when the computer sleeps" and set the options under "put the computer to sleep" to never.
 
 ## License
 MIT

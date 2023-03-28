@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     }
 
 #ifndef __DEBUG
-    // FreeConsole();
+    FreeConsole();
 #endif
 
     BOOL destroy_status = DestroyWindow(cwin);
@@ -75,13 +75,6 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     Sleep(1000);
 
-    HANDLE jobh = CreateJobObjectA(NULL, "docker-clij");
-
-    if (!jobh) {
-        perror_win("Create Job");
-        return ESYSTEM;
-    }
-
     char daemon_path[MAX_PATH];
     // const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
     sprintf(daemon_path, "%s\\daemon", docker_path);
@@ -89,10 +82,10 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     PROCESS_INFORMATION pinfo;
     status = init_daemon(daemon_path, NULL, &pinfo);
 
-    printf("Init daemon: %d", status);
-    printf("pinfo: %d", pinfo.dwProcessId);
-
-    AssignProcessToJobObject(jobh, pinfo.hProcess);
+#ifdef __DEBUG
+    printf("Init daemon: %d\n", status);
+    printf("Process id: %d\n", pinfo.dwProcessId);
+#endif
 
     ResumeThread(pinfo.hThread);
     // system(daemon_path);

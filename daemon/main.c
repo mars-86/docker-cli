@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <windows.h>
+#include <signal.h>
 #include "daemon.h"
 #include "../common/common.h"
 
-#define BASE_CMD "wsl -d docker-cli -- dockerd"
+#define WSL_PATH "C:\\Windows\\System32\\wsl.exe"
+#define BASE_ARGS " -d docker-cli -- dockerd"
 
 void perror_win(const char *msg)
 {
@@ -15,6 +17,13 @@ void perror_win(const char *msg)
         LocalFree(buff);
 }
 
+static int terminate = 0;
+
+void on_sigint(int sig)
+{
+    terminate = 1;
+}
+
 int main(int argc, char *argv[])
 {
     show_banner();
@@ -22,60 +31,35 @@ int main(int argc, char *argv[])
     /* fix */
     Sleep(1000);
 
-    const char *cmd = parse_cmdl(BASE_CMD, (const char **)(argv + 1));
+    const char *args = parse_cmdl(BASE_ARGS, (const char **)(argv + 1));
 
-    HANDLE jobh = CreateJobObjectA(NULL, "dockerdaemon");
-
-    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli;
-    jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-    SetInformationJobObject(jobh, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
-
-    if (!jobh) {
-        perror_win("Create Job");
-        return 99;
-    }
-
-    STARTUPINFO sinfo;
+    int status;
     PROCESS_INFORMATION pinfo;
-    char daemon_path[MAX_PATH];
+    status = init_daemon(WSL_PATH, (char *)args, &pinfo);
 
-    memset(&sinfo, 0, sizeof(sinfo));
-    memset(&pinfo, 0, sizeof(pinfo));
-
-    sinfo.cb = sizeof(sinfo);
-    sinfo.dwFlags = STARTF_USESHOWWINDOW;
-    sinfo.wShowWindow = SW_HIDE;
-
-    int status = CreateProcessA(
-        "C:\\Windows\\System32\\wsl.exe",
-        " -d docker-cli -- dockerd",
-        NULL,
-        NULL,
-        0,
-        NORMAL_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP | CREATE_SUSPENDED | CREATE_NO_WINDOW,
-        NULL,
-        NULL,
-        &sinfo,
-        &pinfo
-    );
-
-    if (!status) {
-        perror_win("Create Process");
-        return 99;
+    if (status) {
+        perror_win("Init daemon");
+        return status;
     }
-
-    AssignProcessToJobObject(jobh, pinfo.hProcess);
 
     ResumeThread(pinfo.hThread);
-    // init_daemon(NULL, NULL);
-    // exec(cmd);
-    /* fix */
-    Sleep(5000);
 
-    free_cmdl((char *)cmd);
+    free_cmdl((char *)args);
 
-    printf("ACA\n");
-    system("PAUSE");
+    /* set signal handler */
+    signal(SIGINT, on_sigint);
+
+    /* fix: wait for sigint */
+    while (!terminate)
+        Sleep(1000);
+
+    printf("Shuting down dockerd: ");
+    status = exec("wsl -t docker-cli");
+    Sleep(1000);
+
+    CloseHandle(pinfo.hProcess);
+
+    printf("Dockerd gracefully stopped\n");
 
     return 0;
 }

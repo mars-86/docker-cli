@@ -46,7 +46,6 @@ int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
         return ESYSTEM;
     }
 
-    printf("pinfo: %d\n", pinfo.dwProcessId);
     *proc = pinfo;
     // WaitForSingleObject(pinfo.hProcess, INFINITE);
 

@@ -12,10 +12,10 @@ LDIR =../lib
 
 LIBS=-lws2_32
 
-_DEPS = gui.h
+_DEPS = elem.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o gui.o process.o
+_OBJ = main.o elem.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
@@ -27,7 +27,7 @@ $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 $(ODIR)/%.o: $(EXSDIR)/%.c $(EXDEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli-init
+install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli
 
 $(OUTDIR):
 	mkdir $@
@@ -35,7 +35,7 @@ $(OUTDIR):
 $(ODIR):
 	mkdir $@
 
-$(OUTDIR)/docker-cli-init: $(OBJ)
+$(OUTDIR)/docker-cli: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean

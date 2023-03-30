@@ -27,7 +27,7 @@ $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 $(ODIR)/%.o: $(EXSDIR)/%.c $(EXDEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli-init
+install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli
 
 $(OUTDIR):
 	mkdir $@
@@ -35,7 +35,7 @@ $(OUTDIR):
 $(ODIR):
 	mkdir $@
 
-$(OUTDIR)/docker-cli-init: $(OBJ)
+$(OUTDIR)/docker-cli: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean

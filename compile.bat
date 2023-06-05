@@ -16,6 +16,10 @@ cd cli
 make install
 cd ..
 
+cd gui
+make install
+cd ..
+
 cd init
 make install
 cd ..

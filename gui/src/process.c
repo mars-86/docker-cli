@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 #include "../inc/process.h"
 #include "../../constants/inc/error_codes.h"
 

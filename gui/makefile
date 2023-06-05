@@ -12,10 +12,10 @@ LDIR =../lib
 
 LIBS=-lws2_32
 
-_DEPS =
+_DEPS = elem.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o
+_OBJ = main.o elem.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)

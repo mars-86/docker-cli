@@ -1,4 +1,4 @@
-#include "../inc/gui.h"
+#include "../inc/elem.h"
 #include <stdio.h>
 
 HICON load_icon(HINSTANCE hinst, const char *path)
@@ -71,8 +71,6 @@ int create_tray_icon(HWND hwnd)
     status = Shell_NotifyIconA(NIM_ADD, &nicon);
     if (!status)
         return ESYSTEM;
-
-    Sleep(1000);
 
     nicon.uVersion = NOTIFYICON_VERSION_4;
     status = Shell_NotifyIconA(NIM_SETVERSION, &nicon);

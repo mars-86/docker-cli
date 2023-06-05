@@ -98,7 +98,7 @@ int install(const char *base_path)
     /* terminate vm to set changes */
     exec("wsl -t docker-cli");
 
-    const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc";
+    const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc curl";
     if (exec(idocker_cmd) < 0)
         return ECANNOTIDOCK;
 

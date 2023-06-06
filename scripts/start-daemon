@@ -1,5 +1,6 @@
 #!/bin/ash
 
+# refactor: allow params to daemon
 dockerd &> /var/log/dockerd &
 
 # fix: wait until dockerd.sock is listening

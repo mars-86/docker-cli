@@ -17,10 +17,10 @@ void show_banner(void)
 
 int init_daemon(const char *path, char *args)
 {
-    char daemon_path[MAX_PATH];
+    char daemon_cmd[256];
 
-    sprintf(daemon_path, "%s%s %s", path, "\\daemon\\dockerd.exe", args ? args : "");
-    int status = exec(daemon_path);
+    sprintf(daemon_cmd, "%s %s %s", path, "-d docker-cli -- start-dockerd", args ? args : "");
+    int status = exec(daemon_cmd);
 
     if (status < 0)
         return ECANNOTINITDAE;

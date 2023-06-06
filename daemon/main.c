@@ -34,15 +34,19 @@ int main(int argc, char *argv[])
     const char *args = parse_cmdl(BASE_ARGS, (const char **)(argv + 1));
 
     int status;
-    PROCESS_INFORMATION pinfo;
-    status = init_daemon(WSL_PATH, (char *)args, &pinfo);
+    // PROCESS_INFORMATION pinfo;
+    // status = init_daemon(WSL_PATH, (char *)args, &pinfo);
+    pthread_t tid;
+    status = init_daemon(WSL_PATH, (char *)args);
+
+    printf("%d\n", tid);
 
     if (status) {
         perror_win("Init daemon");
         return status;
     }
 
-    ResumeThread(pinfo.hThread);
+    // ResumeThread(pinfo.hThread);
 
     free_cmdl((char *)args);
 
@@ -57,7 +61,8 @@ int main(int argc, char *argv[])
     status = exec("wsl -t docker-cli");
     Sleep(1000);
 
-    CloseHandle(pinfo.hProcess);
+    pthread_join(tid, NULL);
+    // CloseHandle(pinfo.hProcess);
 
     printf("Dockerd gracefully stopped\n");
 

@@ -10,7 +10,7 @@ OUTDIR=bin
 ODIR=obj
 LDIR=lib
 
-LIBS=-lws2_32
+LIBS=-lws2_32 -lpthread
 
 _DEPS = init.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

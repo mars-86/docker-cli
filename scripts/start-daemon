@@ -1,0 +1,6 @@
+#!/bin/ash
+
+dockerd &> /var/log/dockerd &
+
+# fix: wait until dockerd.sock is listening
+sleep 5

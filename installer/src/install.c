@@ -35,6 +35,15 @@ static int edit_dns(void)
     return status;
 }
 
+static int copy_start_scripts(void)
+{
+    int status = 0;
+    status = exec("wsl -d docker-cli -- cp ../../scripts/start-daemon /usr/bin");
+    status = exec("wsl -d docker-cli chmod 754 /usr/bin/start-daemon");
+
+    return status;
+}
+
 void show_banner(void)
 {
     printf(
@@ -95,6 +104,8 @@ int install(const char *base_path)
 */
 
     edit_dns();
+    copy_start_scripts();
+
     /* terminate vm to set changes */
     exec("wsl -t docker-cli");
 

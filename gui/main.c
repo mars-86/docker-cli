@@ -16,6 +16,8 @@ void perror_win(const char *msg)
 #define UNICODE
 #endif
 
+static pthread_t daemon_tid;
+
 HINSTANCE hinst;
 LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_param);
 
@@ -68,25 +70,20 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
         perror_win("Destroy Window");
     }
 */
-    Sleep(1000);
-
     char daemon_path[MAX_PATH];
     // const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
     sprintf(daemon_path, "%s\\daemon", docker_path);
 
-    PROCESS_INFORMATION pinfo;
-    status = init_daemon(daemon_path, NULL, &pinfo);
+    status = init_daemon(daemon_path, NULL, &daemon_tid);
 
 #ifdef __DEBUG
     printf("Init daemon: %d\n", status);
     printf("Process id: %d\n", pinfo.dwProcessId);
 #endif
 
-    ResumeThread(pinfo.hThread);
-    // system(daemon_path);
-    // printf("daemon running\n");
-    Sleep(1000);
+    Sleep(5000);
 
+    check_daemon_status();
     printf("dockerd running\n");
     // Run the message loop.
     MSG msg = {};
@@ -164,6 +161,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
         }
         break;
     case WM_DESTROY:
+        pthread_join(daemon_tid, NULL);
         PostQuitMessage(0);
         break;
     default:

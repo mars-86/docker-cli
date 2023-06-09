@@ -80,8 +80,10 @@ int init_daemon(const char *path, char *args, pthread_t *tid)
 
 int check_daemon_status(void)
 {
-    int status = exec("wsl -d docker-cli curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json");
-    printf("daemon check: %d\n", status);
+    int status = exec("wsl -d docker-cli curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json &> C:\\Users\\spa_1\\docker-cli\\dockerd-status");
+    
+    if (status < 0)
+        return DOCKERCLIE_CNOTCHECKDAESTAT;
 
     return EOK;
 }

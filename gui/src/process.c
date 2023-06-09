@@ -61,7 +61,7 @@ void *start_daemon(void *args)
 {
     char *cmd = (char *)args;
 
-    exec("C:\\Users\\spa_1\\docker-cli\\daemon\\dockerd.exe");
+    int status = exec(cmd);
     return NULL;
 }
 

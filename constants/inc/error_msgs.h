@@ -5,9 +5,11 @@ static const char *error_msg[] = {
     "No error",
     "Installation canceled",
     "Docker cli already installed",
-    "Cannot create pipe",
-    "Cannot install file system",
-    "Cannot install docker"
+    "Error creating pipe",
+    "Error installing file system",
+    "Error installing docker",
+    "Error initializing daemon",
+    "Error checking daemon status"
 };
 
 #endif // __DOCKER_CLI_CONSTANTS_ERROR_MSGS_INCLUDED_H__

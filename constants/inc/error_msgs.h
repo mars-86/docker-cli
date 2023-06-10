@@ -7,6 +7,7 @@ static const char *error_msg[] = {
     "Docker cli already installed",
     "Error creating pipe",
     "Error installing file system",
+    "Error creating folder",
     "Error installing docker",
     "Error initializing daemon",
     "Error checking daemon status"

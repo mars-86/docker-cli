@@ -6,6 +6,8 @@
 #include "../../constants/inc/error_codes.h"
 #include "../../common/common.h"
 
+#define NFOLDERS 4
+
 void perror_win(const char *msg)
 {
         WCHAR *buff;
@@ -18,6 +20,20 @@ void perror_win(const char *msg)
 
 static const LPCSTR env_skey = "Environment";
 static const LPCSTR run_skey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+
+enum FOLDER_PATH_NAME {
+    DOCKERCLI_BIN_PATH_IDX = 0,
+    DOCKERCLI_CLI_PATH_IDX,
+    DOCKERCLI_DAEMON_PATH_IDX,
+    DOCKERCLI_TMP_PATH_IDX
+};
+
+static const char folders_path[NFOLDERS][MAX_PATH] = {
+    "\\docker-cli\\bin",
+    "\\docker-cli\\cli"
+    "\\docker-cli\\daemon",
+    "\\docker-cli\\tmp"
+};
 
 static int env_exist(const char *name, const char *skey)
 {
@@ -42,6 +58,21 @@ static int copy_start_scripts(void)
     status = exec("wsl -d docker-cli chmod 754 /usr/bin/start-daemon");
 
     return status;
+}
+
+static int mk_folders(const char *base_path)
+{
+    char mkdir_cmd[512];
+    int i, status;
+
+    for (i = 0; i < NFOLDERS; ++i) {
+        sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, folders_path[i]);
+        status = exec(mkdir_cmd);
+        if (status < 0)
+            return DOCKERCLIE_CREATEFOLDER;
+    }
+
+    return EOK;    
 }
 
 void show_banner(void)
@@ -83,7 +114,7 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[MAX_PATH], idt_cmd[MAX_PATH];
+    char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[512], idt_cmd[512];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
     sprintf(install_path, "%s\\docker-cli", base_path);
@@ -96,6 +127,8 @@ int install(const char *base_path)
 #endif
     if (exec(ifs_cmd) < 0)
         return ECANNOTIFS;
+
+    mk_folders(base_path);
 
 /*
     TODO: save docker data to another partition

@@ -23,30 +23,30 @@ int main(int argc, char *argv[])
     if (status = check_previous_install())
         return status;
 
-    puts("Getting file system... ");
+    fputs("Getting file system... ", stdout);
     get_fs();
-    puts("OK\n");
+    puts("OK");
 
     const char *user_path = getenv("USERPROFILE");
 
-    puts("Installing docker...\n");
+    puts("Installing docker...");
     if (status = install(user_path))
         return status;
 
-    puts("Adding docker to path... ");
+    fputs("Adding docker to path... ", stdout);
     if (status = add_to_path())
         return status;
-    puts("OK\n");
+    puts("OK");
 /*
     printf("Creating docker service...\n");
     if (status = create_docker_service())
         return status;
 */
 
-    puts("Adding docker to run on boot... ");
+    fputs("Adding docker to run on boot... ", stdout);
     if (status = start_on_boot())
         return status;
-    puts("OK\n");
+    puts("OK");
 
 #ifdef __DEBUG
     printf("%d\n", status);

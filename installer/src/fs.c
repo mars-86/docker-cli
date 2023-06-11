@@ -52,7 +52,9 @@ void get_fs(void)
         if (res == 0) {
             FILE *f = fopen(full_path, "wb");
             int i = 0;
+#ifdef __DEBUG
             printf("Saving filesystem in %s...\n", full_path);
+#endif
             while (i < chunk.size)
                 fputc(chunk.response[i++], f);
             fclose(f);

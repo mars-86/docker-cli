@@ -198,25 +198,25 @@ int install(const char *base_path)
     if ((exec(idocker_cmd)) < 0)
         return ECANNOTIDOCK;
 
-    puts("Copying docker... ");
+    fputs("Copying docker... ", stdout);
     if (status = copy_docker(base_path))
         return status;
-    puts("OK\n");
+    puts("OK");
 
-    puts("Copying daemon... ");
+    fputs("Copying daemon... ", stdout);
     if (status = copy_daemon(base_path))
         return status;
-    puts("OK\n");
+    puts("OK");
 
-    puts("Copying bin... ");
+    fputs("Copying bin... ", stdout);
     if (status = copy_bin_cli(base_path))
         return status;
-    puts("OK\n");
+    puts("OK");
 
-    puts("Copying assets... ");
+    fputs("Copying assets... ", stdout);
     if (status = copy_assets(base_path))
         return status;
-    puts("OK\n");
+    puts("OK");
 
     return status;
 }

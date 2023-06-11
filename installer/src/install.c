@@ -7,6 +7,7 @@
 #include "../../common/common.h"
 
 #define NFOLDERS 4
+#define MKDIR_CMD "mkdir"
 
 void perror_win(const char *msg)
 {
@@ -66,13 +67,12 @@ static int mk_folders(const char *base_path)
     int i, status;
 
     for (i = 0; i < NFOLDERS; ++i) {
-        sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, folders_path[i]);
-        status = exec(mkdir_cmd);
-        if (status < 0)
+        sprintf(mkdir_cmd, "%s %s%s", MKDIR_CMD, base_path, folders_path[i]);
+        if (status = exec(mkdir_cmd) < 0)
             return DOCKERCLIE_CREATEFOLDER;
     }
 
-    return EOK;    
+    return EOK;
 }
 
 void show_banner(void)
@@ -114,6 +114,8 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
+    int status = EOK;
+
     char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[512], idt_cmd[512];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
@@ -125,10 +127,11 @@ int install(const char *base_path)
 #ifdef __DEBUG
     printf("%s\n", ifs_cmd);
 #endif
-    if (exec(ifs_cmd) < 0)
+    if ((exec(ifs_cmd)) < 0)
         return ECANNOTIFS;
 
-    mk_folders(base_path);
+    if ((status = mk_folders(base_path)) != EOK)
+        return status;
 
 /*
     TODO: save docker data to another partition
@@ -143,10 +146,10 @@ int install(const char *base_path)
     exec("wsl -t docker-cli");
 
     const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc curl";
-    if (exec(idocker_cmd) < 0)
+    if ((exec(idocker_cmd)) < 0)
         return ECANNOTIDOCK;
 
-    return EOK;
+    return status;
 }
 
 int add_to_path(void)
@@ -174,12 +177,10 @@ int add_to_path(void)
 
 int copy_docker(const char *base_path)
 {
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\bin");
+    char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
 
     int status = EOK;
-    status = exec(mkdir_cmd);
     status = exec(cp_cmd);
 
     return status;
@@ -187,12 +188,10 @@ int copy_docker(const char *base_path)
 
 int copy_daemon(const char *base_path)
 {
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
+    char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
 
     int status = EOK;
-    status = exec(mkdir_cmd);
     status = exec(cp_cmd);
 
     return status;
@@ -200,12 +199,10 @@ int copy_daemon(const char *base_path)
 
 int copy_bin_cli(const char *base_path)
 {
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\cli");
+    char cp_cmd[512];
     sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
     
     int status = EOK;
-    status = exec(mkdir_cmd);
     status = exec(cp_cmd);
 
     return status;

@@ -8,7 +8,6 @@
 
 int main(int argc, char *argv[])
 {
-
     int status = 0;
     if ((status = exec("..\\..\\installer\\bin\\installer")) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 #ifdef __DEBUG
     printf("%c", opt);
 #endif
+
     if (opt != 'Y')
         return ECANCELEDINSTALL;
 

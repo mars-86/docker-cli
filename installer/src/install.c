@@ -56,8 +56,8 @@ static int edit_dns(void)
 static int copy_start_scripts(void)
 {
     int status = 0;
-    status = exec("wsl -d docker-cli -- cp ../../scripts/start-daemon /usr/bin");
-    status = exec("wsl -d docker-cli chmod 754 /usr/bin/start-daemon");
+    status = exec("wsl -d docker-cli -- cp ../../scripts/start-dockerd /usr/bin");
+    status = exec("wsl -d docker-cli chmod 754 /usr/bin/start-dockerd");
 
     return status;
 }
@@ -83,7 +83,7 @@ static int mk_folders(const char *base_path)
 static int copy_docker(const char *base_path)
 {
     char cp_cmd[MAX_CMD_LEN];
-    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli", base_path, "\\docker-cli\\bin\\");
+    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli-init", base_path, "\\docker-cli\\bin\\");
 
     int status = EOK;
     status = exec(cp_cmd);

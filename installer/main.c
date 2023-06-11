@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     show_banner();
     int opt = 'n';
 
-    puts("This will install docker engine in your system\nAre you sure you want to continue [Y/n] ");
+    fputs("This will install docker engine in your system\nAre you sure you want to continue [Y/n] ", stdout);
     scanf("%c", &opt);
 
 #ifdef __DEBUG

@@ -75,6 +75,50 @@ static int mk_folders(const char *base_path)
     return EOK;
 }
 
+static int copy_docker(const char *base_path)
+{
+    char cp_cmd[512];
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
+
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_daemon(const char *base_path)
+{
+    char cp_cmd[512];
+    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
+
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_bin_cli(const char *base_path)
+{
+    char cp_cmd[512];
+    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
+    
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_assets(const char *base_path)
+{
+    char cp_cmd[512];
+    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\assets\\settings.ico ", base_path, "\\docker-cli\\");
+    
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
 void show_banner(void)
 {
     printf(
@@ -149,6 +193,22 @@ int install(const char *base_path)
     if ((exec(idocker_cmd)) < 0)
         return ECANNOTIDOCK;
 
+    printf("Copying docker...\n");
+    if (status = copy_docker(base_path))
+        return status;
+
+    printf("Copying daemon...\n");
+    if (status = copy_daemon(base_path))
+        return status;
+    
+    printf("Copying bin...\n");
+    if (status = copy_bin_cli(base_path))
+        return status;
+    
+    printf("Copying assets...\n");
+    if (status = copy_assets(base_path))
+        return status;
+
     return status;
 }
 
@@ -173,50 +233,6 @@ int add_to_path(void)
         free(newpathval);
     }
     return EOK;
-}
-
-int copy_docker(const char *base_path)
-{
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
-
-    int status = EOK;
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_daemon(const char *base_path)
-{
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
-
-    int status = EOK;
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_bin_cli(const char *base_path)
-{
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
-    
-    int status = EOK;
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_assets(const char *base_path)
-{
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\assets\\settings.ico ", base_path, "\\docker-cli\\");
-    
-    int status = EOK;
-    status = exec(cp_cmd);
-
-    return status;
 }
 
 int start_on_boot(void)

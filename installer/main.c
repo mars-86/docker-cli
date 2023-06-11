@@ -30,22 +30,6 @@ int main(int argc, char *argv[])
     printf("Installing docker...\n");
     if (status = install(user_path))
         return status;
-    
-    printf("Copying docker...\n");
-    if (status = copy_docker(user_path))
-        return status;
-
-    printf("Copying daemon...\n");
-    if (status = copy_daemon(user_path))
-        return status;
-    
-    printf("Copying bin...\n");
-    if (status = copy_bin_cli(user_path))
-        return status;
-    
-    printf("Copying assets...\n");
-    if (status = copy_assets(user_path))
-        return status;
 
     printf("Adding docker to path...\n");
     if (status = add_to_path())

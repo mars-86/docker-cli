@@ -8,6 +8,7 @@
 
 #define NFOLDERS 4
 #define MKDIR_CMD "mkdir"
+#define MAX_CMD_LEN 512
 
 void perror_win(const char *msg)
 {
@@ -31,7 +32,7 @@ enum FOLDER_PATH_NAME {
 
 static const char folders_path[NFOLDERS][MAX_PATH] = {
     "\\docker-cli\\bin",
-    "\\docker-cli\\cli"
+    "\\docker-cli\\cli",
     "\\docker-cli\\daemon",
     "\\docker-cli\\tmp"
 };
@@ -63,11 +64,15 @@ static int copy_start_scripts(void)
 
 static int mk_folders(const char *base_path)
 {
-    char mkdir_cmd[512];
+    char mkdir_cmd[MAX_CMD_LEN];
     int i, status;
 
     for (i = 0; i < NFOLDERS; ++i) {
+        memset(mkdir_cmd, 0, MAX_CMD_LEN);
         sprintf(mkdir_cmd, "%s %s%s", MKDIR_CMD, base_path, folders_path[i]);
+#ifdef __DEBUG
+        printf("%s\n", mkdir_cmd);
+#endif
         if (status = exec(mkdir_cmd) < 0)
             return DOCKERCLIE_CREATEFOLDER;
     }
@@ -77,8 +82,8 @@ static int mk_folders(const char *base_path)
 
 static int copy_docker(const char *base_path)
 {
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli", base_path, "\\docker-cli\\bin\\");
 
     int status = EOK;
     status = exec(cp_cmd);
@@ -88,8 +93,8 @@ static int copy_docker(const char *base_path)
 
 static int copy_daemon(const char *base_path)
 {
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\daemon\\bin\\dockerd", base_path, "\\docker-cli\\daemon\\");
 
     int status = EOK;
     status = exec(cp_cmd);
@@ -99,8 +104,8 @@ static int copy_daemon(const char *base_path)
 
 static int copy_bin_cli(const char *base_path)
 {
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\cli\\bin\\docker", base_path, "\\docker-cli\\cli\\");
     
     int status = EOK;
     status = exec(cp_cmd);
@@ -110,8 +115,8 @@ static int copy_bin_cli(const char *base_path)
 
 static int copy_assets(const char *base_path)
 {
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\assets\\settings.ico ", base_path, "\\docker-cli\\");
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\assets\\settings.ico", base_path, "\\docker-cli\\");
     
     int status = EOK;
     status = exec(cp_cmd);
@@ -193,21 +198,25 @@ int install(const char *base_path)
     if ((exec(idocker_cmd)) < 0)
         return ECANNOTIDOCK;
 
-    printf("Copying docker...\n");
+    puts("Copying docker... ");
     if (status = copy_docker(base_path))
         return status;
+    puts("OK\n");
 
-    printf("Copying daemon...\n");
+    puts("Copying daemon... ");
     if (status = copy_daemon(base_path))
         return status;
-    
-    printf("Copying bin...\n");
+    puts("OK\n");
+
+    puts("Copying bin... ");
     if (status = copy_bin_cli(base_path))
         return status;
-    
-    printf("Copying assets...\n");
+    puts("OK\n");
+
+    puts("Copying assets... ");
     if (status = copy_assets(base_path))
         return status;
+    puts("OK\n");
 
     return status;
 }

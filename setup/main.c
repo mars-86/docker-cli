@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     // const char *docker_cli_home_path = getenv(DOCKER_CLI_HOME_VAR_NAME);
     // sprintf(docker_cli_path, "%s\\bin\\docker-cli", docker_cli_home_path);
 
-    if ((status = exec("..\\..\\init\\bin\\docker-cli-init")) > 0) {
+    if ((status = exec("..\\..\\init\\bin\\docker-cli")) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);
         return status;
     }

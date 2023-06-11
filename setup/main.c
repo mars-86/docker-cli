@@ -9,18 +9,18 @@
 int main(int argc, char *argv[])
 {
     int status = 0;
-    if ((status = exec("..\\..\\installer\\bin\\installer")) > 0) {
+/*    if ((status = exec("..\\..\\installer\\bin\\installer")) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);
         return status;
     }
-
+*/
     /* TODO: refresh env vars */
 
     // char docker_cli_path[MAX_PATH];
     // const char *docker_cli_home_path = getenv(DOCKER_CLI_HOME_VAR_NAME);
     // sprintf(docker_cli_path, "%s\\bin\\docker-cli", docker_cli_home_path);
 
-    if ((status = exec("..\\..\\init\\bin\\docker-cli")) > 0) {
+    if ((status = exec("..\\..\\init\\bin\\docker-cli-init")) > 0) {
         fprintf(stderr, "%s\n", error_msg[status]);
         return status;
     }

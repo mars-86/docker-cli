@@ -49,7 +49,7 @@ int create_tray_icon(HWND hwnd)
     ico = load_icon(NULL, icon_path);
 
     if (!ico)
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
     NOTIFYICONDATA nicon;
     nicon.cbSize = sizeof(nicon);
@@ -70,12 +70,12 @@ int create_tray_icon(HWND hwnd)
 
     status = Shell_NotifyIconA(NIM_ADD, &nicon);
     if (!status)
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
     nicon.uVersion = NOTIFYICON_VERSION_4;
     status = Shell_NotifyIconA(NIM_SETVERSION, &nicon);
     if (!status)
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
 #endif
 
     if (opt != 'Y')
-        return ECANCELEDINSTALL;
+        return DOCKERCLIE_CANCELEDINSTALL;
 
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
 
     if (status = check_previous_install())
         return status;

@@ -23,7 +23,7 @@ int init_daemon(const char *path, char *args)
     int status = exec(daemon_cmd);
 
     if (status < 0)
-        return ECANNOTINITDAE;
+        return DOCKERCLIE_CANNOTINITDAE;
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

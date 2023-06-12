@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     if (!status) {
         perror_win("Create Process");
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
     }
 
     ResumeThread(pinfo.hThread);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     CloseHandle(pinfo.hProcess);
     CloseHandle(pinfo.hThread);
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 */
 
@@ -87,5 +87,5 @@ int main(int argc, char *argv[])
     Sleep(2000);
     pthread_attr_destroy(&attr);
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

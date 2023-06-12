@@ -44,7 +44,7 @@ int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
 
     if (!status) {
         perror_win2("Create Process");
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
     }
 
     *proc = pinfo;
@@ -53,7 +53,7 @@ int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
     // CloseHandle(pinfo.hProcess);
     // CloseHandle(pinfo.hThread);
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 */
 
@@ -76,9 +76,9 @@ int init_daemon(const char *path, char *args, pthread_t *tid)
     int status = pthread_create(tid, NULL, start_daemon, daemon_path);
 
     if (status > 0)
-        return ECANNOTINITDAE;
+        return DOCKERCLIE_CANNOTINITDAE;
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 
 int check_daemon_status(void)
@@ -88,5 +88,5 @@ int check_daemon_status(void)
     if (status < 0)
         return DOCKERCLIE_CHECKDAESTAT;
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

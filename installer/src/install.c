@@ -77,7 +77,7 @@ static int mk_folders(const char *base_path)
             return DOCKERCLIE_CREATEFOLDER;
     }
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 
 static int copy_docker(const char *base_path)
@@ -85,7 +85,7 @@ static int copy_docker(const char *base_path)
     char cp_cmd[MAX_CMD_LEN];
     sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli-init", base_path, "\\docker-cli\\bin\\");
 
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
 
     return status;
@@ -96,7 +96,7 @@ static int copy_daemon(const char *base_path)
     char cp_cmd[MAX_CMD_LEN];
     sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\daemon\\bin\\dockerd", base_path, "\\docker-cli\\daemon\\");
 
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
 
     return status;
@@ -107,7 +107,7 @@ static int copy_bin_cli(const char *base_path)
     char cp_cmd[MAX_CMD_LEN];
     sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\cli\\bin\\docker", base_path, "\\docker-cli\\cli\\");
     
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
 
     return status;
@@ -118,7 +118,7 @@ static int copy_assets(const char *base_path)
     char cp_cmd[MAX_CMD_LEN];
     sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\assets\\settings.ico", base_path, "\\docker-cli\\");
     
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
 
     return status;
@@ -141,7 +141,7 @@ int check_previous_install(void)
     /* for some weird reason wsl returns null characters after the letters */
     FILE *pipe;
     if ((pipe = _popen("wsl -l", "rt")) == NULL)
-        return ECANNOTCPIPE;
+        return DOCKERCLIE_CANNOTCPIPE;
 
     char name[] = "docker-cli";
     int i = 0, c, len = strlen(name), installed = 0;
@@ -152,7 +152,7 @@ int check_previous_install(void)
 #endif
         i = (name[i] == c) ? (i + 1) : 0;
         if (i == len) {
-            installed = EDOCKINSTALLED;
+            installed = DOCKERCLIE_DOCKINSTALLED;
             break;
         }
     }
@@ -163,7 +163,7 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    int status = EOK;
+    int status = DOCKERCLIE_OK;
 
     char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[512], idt_cmd[512];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
@@ -177,15 +177,15 @@ int install(const char *base_path)
     printf("%s\n", ifs_cmd);
 #endif
     if ((exec(ifs_cmd)) < 0)
-        return ECANNOTIFS;
+        return DOCKERCLIE_CANNOTIFS;
 
-    if ((status = mk_folders(base_path)) != EOK)
+    if ((status = mk_folders(base_path)) != DOCKERCLIE_OK)
         return status;
 
 /*
     TODO: save docker data to another partition
     if (exec(idt_cmd) < 0)
-        return ECANNOTIFS;
+        return DOCKERCLIE_CANNOTIFS;
 */
 
     edit_dns();
@@ -196,7 +196,7 @@ int install(const char *base_path)
 
     const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc curl";
     if ((exec(idocker_cmd)) < 0)
-        return ECANNOTIDOCK;
+        return DOCKERCLIE_CANNOTIDOCK;
 
     fputs("Copying docker... ", stdout);
     if (status = copy_docker(base_path))
@@ -241,7 +241,7 @@ int add_to_path(void)
         RegSetValueExA(hkey, "Path", 0, REG_EXPAND_SZ, newpathval, strlen(newpathval));
         free(newpathval);
     }
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 
 int start_on_boot(void)
@@ -255,20 +255,20 @@ int start_on_boot(void)
         RegOpenKeyExA(HKEY_CURRENT_USER, run_skey, 0, KEY_SET_VALUE , &hkey);
         RegSetValueExA(hkey, dockdvname, 0, REG_SZ, docker_cli_path, strlen(docker_cli_path));
     }
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 
 int install_docker_service(void)
 {
     SC_HANDLE mngrh;
     if (!(mngrh = OpenSCManagerA(NULL, SERVICES_ACTIVE_DATABASE, SC_MANAGER_CREATE_SERVICE)))
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
     SC_HANDLE srvh;
     /*
     srvh = OpenService(mngrh, "Docker cli", DELETE);
     DeleteService(srvh);
-    return EOK;
+    return DOCKERCLIE_OK;
     */
 
     char dockerd_path[MAX_PATH];
@@ -288,18 +288,18 @@ int install_docker_service(void)
         NULL,
         NULL
     )))
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
     /*
     srvh = OpenService(mngrh, "Docker cli", SERVICE_START);
     if (!StartServiceA(srvh, 0, NULL)) {
         perror_win("Start service");
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
     }
     */
 
     if (!CloseServiceHandle(mngrh))
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

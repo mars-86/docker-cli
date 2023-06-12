@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     HWND hwnd = create_main_window(CLASS_NAME, APPLICATION_NAME, h_instance, NULL);
 
     if (hwnd == NULL)
-        return ESYSTEM;
+        return DOCKERCLIE_SYSTEM;
 
 #ifdef __DEBUG
     printf("%d\n", status);
@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     int status = create_tray_icon(hwnd);
 
-    if (status != EOK) {
+    if (status != DOCKERCLIE_OK) {
         perror_win("Create tray icon");
         return status;
     }

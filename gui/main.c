@@ -2,6 +2,8 @@
 #include <windows.h>
 #include "gui.h"
 
+#define APPLICATION_NAME "Docker CLI"
+
 void perror_win(const char *msg)
 {
         WCHAR *buff;
@@ -35,7 +37,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     RegisterClass(&wc);
 
     hinst = h_instance;
-    HWND hwnd = create_main_window(CLASS_NAME, "Docker CLI", h_instance, NULL);
+    HWND hwnd = create_main_window(CLASS_NAME, APPLICATION_NAME, h_instance, NULL);
 
     if (hwnd == NULL)
         return ESYSTEM;
@@ -85,6 +87,14 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     check_daemon_status();
     printf("dockerd running\n");
+
+    SetForegroundWindow(GetConsoleWindow());
+    // ShowWindow(GetConsoleWindow(), SW_HIDE);
+
+    // CloseWindow(GetConsoleWindow());
+    // FreeConsole();
+    // DestroyWindow(GetConsoleWindow());
+    
     // Run the message loop.
     MSG msg = {};
     BOOL bRet;
@@ -107,7 +117,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
 void ShowContextMenu(HWND hwnd, POINT pt)
 {
-    HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(0));
+    HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(IDR_POPUPMENU));
 
     if (!hMenu) {
         perror_win("hmenu");
@@ -118,21 +128,9 @@ void ShowContextMenu(HWND hwnd, POINT pt)
         HMENU hSubMenu = GetSubMenu(hMenu, 0);
         if (hSubMenu)
         {
-            // our window must be foreground before calling TrackPopupMenu or the menu will not disappear when the user clicks away
-            SetForegroundWindow(hwnd);
+            ClientToScreen(hwnd, (LPPOINT) &pt); 
 
-            // respect menu drop alignment
-            UINT uFlags = TPM_RIGHTBUTTON;
-            if (GetSystemMetrics(SM_MENUDROPALIGNMENT) != 0)
-            {
-                uFlags |= TPM_RIGHTALIGN;
-            }
-            else
-            {
-                uFlags |= TPM_LEFTALIGN;
-            }
-
-            TrackPopupMenuEx(hSubMenu, uFlags, pt.x, pt.y, hwnd, NULL);
+            TrackPopupMenuEx(hSubMenu, TPM_RIGHTALIGN | TPM_LEFTALIGN | TPM_BOTTOMALIGN | TPM_NONOTIFY | TPM_RETURNCMD, pt.x, pt.y, hwnd, NULL);
         }
         DestroyMenu(hMenu);
     }
@@ -147,10 +145,14 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
     case WM_NOTIFYCALLBACK:
         switch (LOWORD(l_param)) {
         case WM_LBUTTONDBLCLK:
-            // ShowWindow(hwnd, SW_SHOW);
+            ShowWindow(hwnd, SW_SHOW);
             break;
         case WM_CONTEXTMENU:
-            POINT pt = { LOWORD(w_param), HIWORD(w_param) };
+            POINT pt; // = { LOWORD(w_param), HIWORD(w_param) };
+            GetCursorPos(&pt);
+#ifdef __DEBUG
+            printf("x: %d - y: %d\n", pt.x, pt.y);
+#endif
             ShowContextMenu(hwnd, pt);
             break;
         default:
@@ -160,8 +162,17 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
 #endif
         }
         break;
+    case WM_CLOSE:
+        if (MessageBox(hwnd, "Really quit?", APPLICATION_NAME, MB_OKCANCEL) == IDOK)
+        {
+            DestroyWindow(hwnd);
+            // pthread_join(daemon_tid, NULL);
+            // PostQuitMessage(0);
+        }
+        break;
     case WM_DESTROY:
-        pthread_join(daemon_tid, NULL);
+        // DestroyWindow(hwnd);
+        // pthread_join(daemon_tid, NULL);
         PostQuitMessage(0);
         break;
     default:

@@ -18,10 +18,13 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _EXDEPS = common.h
 EXDEPS = $(patsubst %,$(EXIDIR)/%,$(_EXDEPS))
 
-_OBJ = main.o elem.o process.o cmd_line.o
+_OBJ = main.o elem.o process.o cmd_line.o context_menu.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(ODIR)/%.o: $(MAINDIR)/%.rc $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)

@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     pthread_attr_init(&attr);
 
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&tid, NULL, start_docker, docker_cli_path);
+    pthread_create(&tid, &attr, start_docker, docker_cli_path);
 
     // fix
     Sleep(2000);

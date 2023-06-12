@@ -1,5 +1,7 @@
 @ECHO off
 
+windres -i .\gui\context_menu.rc -o .\gui\obj\context_menu.o
+
 cd setup
 make install
 cd ..

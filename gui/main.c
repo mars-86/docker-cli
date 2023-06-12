@@ -128,8 +128,7 @@ void ShowContextMenu(HWND hwnd, POINT pt)
         HMENU hSubMenu = GetSubMenu(hMenu, 0);
         if (hSubMenu)
         {
-            ClientToScreen(hwnd, (LPPOINT) &pt); 
-
+            ClientToScreen(hwnd, (LPPOINT) &pt);
             // fix: menu orientation
             TrackPopupMenuEx(
                 hSubMenu,

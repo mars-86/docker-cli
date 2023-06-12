@@ -1,0 +1,6 @@
+#ifndef __DOCKER_CLI_COMMON_PROCESS_INCLUDED_H__
+#define __DOCKER_CLI_COMMON_PROCESS_INCLUDED_H__
+
+int exec(const char *cmd);
+
+#endif // __DOCKER_CLI_COMMON_PROCESS_INCLUDED_H__

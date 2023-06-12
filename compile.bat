@@ -1,6 +1,6 @@
 @ECHO off
 
-windres -i .\gui\context_menu.rc -o .\gui\obj\context_menu.o
+windres -i .\gui\resources.rc -o .\gui\obj\resources.o
 
 cd setup
 make install

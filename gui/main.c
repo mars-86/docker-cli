@@ -117,7 +117,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
 void ShowContextMenu(HWND hwnd, POINT pt)
 {
-    HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(IDR_POPUPMENU));
+    HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(IDR_TRAY_POPUPMENU));
 
     if (!hMenu) {
         perror_win("hmenu");
@@ -130,7 +130,15 @@ void ShowContextMenu(HWND hwnd, POINT pt)
         {
             ClientToScreen(hwnd, (LPPOINT) &pt); 
 
-            TrackPopupMenuEx(hSubMenu, TPM_RIGHTALIGN | TPM_LEFTALIGN | TPM_BOTTOMALIGN | TPM_NONOTIFY | TPM_RETURNCMD, pt.x, pt.y, hwnd, NULL);
+            // fix: menu orientation
+            TrackPopupMenuEx(
+                hSubMenu,
+                TPM_LEFTALIGN | TPM_BOTTOMALIGN | TPM_HORPOSANIMATION | TPM_VERNEGANIMATION | TPM_RETURNCMD,
+                pt.x,
+                pt.y,
+                hwnd,
+                NULL
+            );
         }
         DestroyMenu(hMenu);
     }

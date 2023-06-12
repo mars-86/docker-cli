@@ -1,5 +1,7 @@
 @ECHO off
 
+windres -i .\gui\resources.rc -o .\gui\obj\resources.o
+
 cd setup
 make install
 cd ..

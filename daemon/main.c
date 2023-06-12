@@ -34,17 +34,14 @@ int main(int argc, char *argv[])
     const char *args = parse_cmdl(BASE_ARGS, (const char **)(argv + 1));
 
     int status;
-    PROCESS_INFORMATION pinfo;
-    status = init_daemon(WSL_PATH, (char *)args, &pinfo);
+    status = init_daemon(WSL_PATH, (char *)args);
+
+    free_cmdl((char *)args);
 
     if (status) {
         perror_win("Init daemon");
         return status;
     }
-
-    ResumeThread(pinfo.hThread);
-
-    free_cmdl((char *)args);
 
     /* set signal handler */
     signal(SIGINT, on_sigint);
@@ -56,8 +53,6 @@ int main(int argc, char *argv[])
     printf("Shuting down dockerd: ");
     status = exec("wsl -t docker-cli");
     Sleep(1000);
-
-    CloseHandle(pinfo.hProcess);
 
     printf("Dockerd gracefully stopped\n");
 

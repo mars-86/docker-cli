@@ -8,12 +8,13 @@ int main(int argc, char *argv[])
     show_banner();
     int opt = 'n';
 
-    printf("This will install docker engine in your system\nAre you sure you want to continue [Y/n] ");
+    fputs("This will install docker engine in your system\nAre you sure you want to continue [Y/n] ", stdout);
     scanf("%c", &opt);
 
 #ifdef __DEBUG
     printf("%c", opt);
 #endif
+
     if (opt != 'Y')
         return ECANCELEDINSTALL;
 
@@ -22,43 +23,30 @@ int main(int argc, char *argv[])
     if (status = check_previous_install())
         return status;
 
-    printf("Getting file system...\n");
+    fputs("Getting file system... ", stdout);
     get_fs();
+    puts("OK");
 
     const char *user_path = getenv("USERPROFILE");
 
-    printf("Installing docker...\n");
+    puts("Installing docker...");
     if (status = install(user_path))
         return status;
-    
-    printf("Copying docker...\n");
-    if (status = copy_docker(user_path))
-        return status;
 
-    printf("Copying daemon...\n");
-    if (status = copy_daemon(user_path))
-        return status;
-    
-    printf("Copying bin...\n");
-    if (status = copy_bin_cli(user_path))
-        return status;
-    
-    printf("Copying assets...\n");
-    if (status = copy_assets(user_path))
-        return status;
-
-    printf("Adding docker to path...\n");
+    fputs("Adding docker to path... ", stdout);
     if (status = add_to_path())
         return status;
+    puts("OK");
 /*
     printf("Creating docker service...\n");
     if (status = create_docker_service())
         return status;
 */
 
-    printf("Adding docker to run on boot...\n");
+    fputs("Adding docker to run on boot... ", stdout);
     if (status = start_on_boot())
         return status;
+    puts("OK");
 
 #ifdef __DEBUG
     printf("%d\n", status);

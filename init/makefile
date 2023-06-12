@@ -10,12 +10,15 @@ OUTDIR=bin
 ODIR=obj
 LDIR =../lib
 
-LIBS=-lws2_32
+LIBS=-lws2_32 -lpthread
 
 _DEPS =
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o
+_EXDEPS = common.h
+EXDEPS = $(patsubst %,$(EXIDIR)/%,$(_EXDEPS))
+
+_OBJ = main.o cmd_line.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
@@ -27,7 +30,7 @@ $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 $(ODIR)/%.o: $(EXSDIR)/%.c $(EXDEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli
+install: $(OUTDIR) $(ODIR) $(OUTDIR)/docker-cli-init
 
 $(OUTDIR):
 	mkdir $@
@@ -35,7 +38,7 @@ $(OUTDIR):
 $(ODIR):
 	mkdir $@
 
-$(OUTDIR)/docker-cli: $(OBJ)
+$(OUTDIR)/docker-cli-init: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean

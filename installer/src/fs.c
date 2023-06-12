@@ -40,7 +40,9 @@ void get_fs(void)
         char errbuff[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_URL, FS_URL);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuff);
+#ifdef __DEBUG
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+#endif
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
@@ -50,7 +52,9 @@ void get_fs(void)
         if (res == 0) {
             FILE *f = fopen(full_path, "wb");
             int i = 0;
+#ifdef __DEBUG
             printf("Saving filesystem in %s...\n", full_path);
+#endif
             while (i < chunk.size)
                 fputc(chunk.response[i++], f);
             fclose(f);

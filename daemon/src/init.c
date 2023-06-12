@@ -15,36 +15,15 @@ void show_banner(void)
     );
 }
 
-int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
+int init_daemon(const char *path, char *args)
 {
-    STARTUPINFO sinfo;
-    PROCESS_INFORMATION pinfo;
-    char daemon_path[MAX_PATH];
+    char daemon_cmd[256];
 
-    memset(&sinfo, 0, sizeof(sinfo));
-    memset(&pinfo, 0, sizeof(pinfo));
+    sprintf(daemon_cmd, "%s %s %s", path, "-d docker-cli -- start-dockerd", args ? args : "");
+    int status = exec(daemon_cmd);
 
-    sinfo.cb = sizeof(sinfo);
-    sinfo.dwFlags = STARTF_USESHOWWINDOW;
-    sinfo.wShowWindow = SW_HIDE;
-
-    int status = CreateProcessA(
-        path,
-        (char *)args,
-        NULL,
-        NULL,
-        0,
-        NORMAL_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP | CREATE_SUSPENDED | CREATE_NO_WINDOW,
-        NULL,
-        NULL,
-        &sinfo,
-        &pinfo
-    );
-
-    if (!status)
-        return ESYSTEM;
-
-    *proc = pinfo;
+    if (status < 0)
+        return ECANNOTINITDAE;
 
     return EOK;
 }

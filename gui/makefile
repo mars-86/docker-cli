@@ -10,15 +10,21 @@ OUTDIR=bin
 ODIR=obj
 LDIR =../lib
 
-LIBS=-lws2_32
+LIBS=-lws2_32 -lpthread
 
 _DEPS = elem.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o elem.o process.o
+_EXDEPS = common.h
+EXDEPS = $(patsubst %,$(EXIDIR)/%,$(_EXDEPS))
+
+_OBJ = main.o elem.o process.o cmd_line.o resources.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(ODIR)/%.o: $(MAINDIR)/%.rc $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)

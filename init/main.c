@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <windows.h>
+#include <pthread.h>
 #include "init.h"
+#include "../common/common.h"
 
 void perror_win(const char *msg)
 {
@@ -11,7 +13,7 @@ void perror_win(const char *msg)
         fprintf(stderr, "%s: %S\n", msg, buff);
         LocalFree(buff);
 }
-
+/*
 int main(int argc, char *argv[])
 {
     STARTUPINFO sinfo;
@@ -31,7 +33,7 @@ int main(int argc, char *argv[])
     flags |= CREATE_NO_WINDOW;
 #endif
 
-    sprintf(docker_cli_path, "%s\\docker-cli.exe", ".\\gui\\bin");
+    sprintf(docker_cli_path, "%s\\docker-cli.exe", "..\\..\\gui\\bin");
     int status = CreateProcessA(
         docker_cli_path,
         NULL,
@@ -51,10 +53,39 @@ int main(int argc, char *argv[])
     }
 
     ResumeThread(pinfo.hThread);
-    // WaitForSingleObject(pinfo.hProcess, INFINITE);
+    WaitForSingleObject(pinfo.hProcess, INFINITE);
 
-    // CloseHandle(pinfo.hProcess);
-    // CloseHandle(pinfo.hThread);}
+    CloseHandle(pinfo.hProcess);
+    CloseHandle(pinfo.hThread);
+
+    return EOK;
+}
+*/
+
+void *start_docker(void *args)
+{
+    const char *cmd = (const char *)args;
+    exec(cmd);
+
+    return NULL;
+}
+
+int main(int argc, char *argv[])
+{
+    char docker_cli_path[MAX_PATH];
+
+    sprintf(docker_cli_path, "%s\\docker-cli.exe", "..\\..\\gui\\bin");
+
+    pthread_t tid;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&tid, &attr, start_docker, docker_cli_path);
+
+    // fix
+    Sleep(2000);
+    pthread_attr_destroy(&attr);
 
     return EOK;
 }

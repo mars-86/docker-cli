@@ -6,6 +6,10 @@
 #include "../../constants/inc/error_codes.h"
 #include "../../common/common.h"
 
+#define NFOLDERS 4
+#define MKDIR_CMD "mkdir"
+#define MAX_CMD_LEN 512
+
 void perror_win(const char *msg)
 {
         WCHAR *buff;
@@ -19,6 +23,20 @@ void perror_win(const char *msg)
 static const LPCSTR env_skey = "Environment";
 static const LPCSTR run_skey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 
+enum FOLDER_PATH_NAME {
+    DOCKERCLI_BIN_PATH_IDX = 0,
+    DOCKERCLI_CLI_PATH_IDX,
+    DOCKERCLI_DAEMON_PATH_IDX,
+    DOCKERCLI_TMP_PATH_IDX
+};
+
+static const char folders_path[NFOLDERS][MAX_PATH] = {
+    "\\docker-cli\\bin",
+    "\\docker-cli\\cli",
+    "\\docker-cli\\daemon",
+    "\\docker-cli\\tmp"
+};
+
 static int env_exist(const char *name, const char *skey)
 {
     int status = RegGetValueA(HKEY_CURRENT_USER, skey, name, RRF_RT_ANY, NULL, NULL, NULL);
@@ -31,6 +49,77 @@ static int edit_dns(void)
     status = exec("wsl -d docker-cli rm /etc/resolv.conf");
     status = exec("wsl -d docker-cli -- cp ../../conf/wsl.conf /etc");
     status = exec("wsl -d docker-cli chmod 644 /etc/wsl.conf");
+
+    return status;
+}
+
+static int copy_start_scripts(void)
+{
+    int status = 0;
+    status = exec("wsl -d docker-cli -- cp ../../scripts/start-dockerd /usr/bin");
+    status = exec("wsl -d docker-cli chmod 754 /usr/bin/start-dockerd");
+
+    return status;
+}
+
+static int mk_folders(const char *base_path)
+{
+    char mkdir_cmd[MAX_CMD_LEN];
+    int i, status;
+
+    for (i = 0; i < NFOLDERS; ++i) {
+        memset(mkdir_cmd, 0, MAX_CMD_LEN);
+        sprintf(mkdir_cmd, "%s %s%s", MKDIR_CMD, base_path, folders_path[i]);
+#ifdef __DEBUG
+        printf("%s\n", mkdir_cmd);
+#endif
+        if (status = exec(mkdir_cmd) < 0)
+            return DOCKERCLIE_CREATEFOLDER;
+    }
+
+    return EOK;
+}
+
+static int copy_docker(const char *base_path)
+{
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli-init", base_path, "\\docker-cli\\bin\\");
+
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_daemon(const char *base_path)
+{
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\daemon\\bin\\dockerd", base_path, "\\docker-cli\\daemon\\");
+
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_bin_cli(const char *base_path)
+{
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\cli\\bin\\docker", base_path, "\\docker-cli\\cli\\");
+    
+    int status = EOK;
+    status = exec(cp_cmd);
+
+    return status;
+}
+
+static int copy_assets(const char *base_path)
+{
+    char cp_cmd[MAX_CMD_LEN];
+    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\assets\\settings.ico", base_path, "\\docker-cli\\");
+    
+    int status = EOK;
+    status = exec(cp_cmd);
 
     return status;
 }
@@ -74,7 +163,9 @@ int check_previous_install(void)
 
 int install(const char *base_path)
 {
-    char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[MAX_PATH], idt_cmd[MAX_PATH];
+    int status = EOK;
+
+    char fs_path[MAX_PATH], install_path[MAX_PATH], install_data_path[MAX_PATH], ifs_cmd[512], idt_cmd[512];
     const char *file_name = "alpine-minirootfs-3.17.1-x86_64.tar.gz";
     sprintf(fs_path, "%s\\%s", getenv("TMP"), file_name);
     sprintf(install_path, "%s\\docker-cli", base_path);
@@ -85,8 +176,11 @@ int install(const char *base_path)
 #ifdef __DEBUG
     printf("%s\n", ifs_cmd);
 #endif
-    if (exec(ifs_cmd) < 0)
+    if ((exec(ifs_cmd)) < 0)
         return ECANNOTIFS;
+
+    if ((status = mk_folders(base_path)) != EOK)
+        return status;
 
 /*
     TODO: save docker data to another partition
@@ -95,14 +189,36 @@ int install(const char *base_path)
 */
 
     edit_dns();
+    copy_start_scripts();
+
     /* terminate vm to set changes */
     exec("wsl -t docker-cli");
 
     const char *idocker_cmd = "wsl -d docker-cli -- apk add --update docker docker-cli-compose openrc curl";
-    if (exec(idocker_cmd) < 0)
+    if ((exec(idocker_cmd)) < 0)
         return ECANNOTIDOCK;
 
-    return EOK;
+    fputs("Copying docker... ", stdout);
+    if (status = copy_docker(base_path))
+        return status;
+    puts("OK");
+
+    fputs("Copying daemon... ", stdout);
+    if (status = copy_daemon(base_path))
+        return status;
+    puts("OK");
+
+    fputs("Copying bin... ", stdout);
+    if (status = copy_bin_cli(base_path))
+        return status;
+    puts("OK");
+
+    fputs("Copying assets... ", stdout);
+    if (status = copy_assets(base_path))
+        return status;
+    puts("OK");
+
+    return status;
 }
 
 int add_to_path(void)
@@ -126,56 +242,6 @@ int add_to_path(void)
         free(newpathval);
     }
     return EOK;
-}
-
-int copy_docker(const char *base_path)
-{
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\bin");
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\init\\bin\\docker-cli ", base_path, "\\docker-cli\\bin\\");
-
-    int status = EOK;
-    status = exec(mkdir_cmd);
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_daemon(const char *base_path)
-{
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\daemon");
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\daemon\\bin\\dockerd ", base_path, "\\docker-cli\\daemon\\");
-
-    int status = EOK;
-    status = exec(mkdir_cmd);
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_bin_cli(const char *base_path)
-{
-    char mkdir_cmd[512], cp_cmd[512];
-    sprintf(mkdir_cmd, "%s%s%s", "mkdir ", base_path, "\\docker-cli\\cli");
-    sprintf(cp_cmd, "%s%s%s", "cp -r ..\\..\\cli\\bin\\docker ", base_path, "\\docker-cli\\cli\\");
-    
-    int status = EOK;
-    status = exec(mkdir_cmd);
-    status = exec(cp_cmd);
-
-    return status;
-}
-
-int copy_assets(const char *base_path)
-{
-    char cp_cmd[512];
-    sprintf(cp_cmd, "%s%s%s", "cp ..\\..\\assets\\settings.ico ", base_path, "\\docker-cli\\");
-    
-    int status = EOK;
-    status = exec(cp_cmd);
-
-    return status;
 }
 
 int start_on_boot(void)

@@ -36,14 +36,16 @@ int main(int argc, char *argv[])
     /* set signal handler */
     signal(SIGINT, on_sigint);
 
-    /* fix: wait for sigint */
-    while (!terminate)
-        Sleep(1000);
+    pthread_mutex_lock(&daemon_thread_mutex);
 
-    fputs("Shuting down dockerd...", stdout);
+    while (!daemon_terminate)
+        pthread_cond_wait(&daemon_thread_cond, &daemon_thread_mutex);
+
+    pthread_mutex_unlock(&daemon_thread_mutex);
+
+    fputs("Shutting down dockerd... ", stdout);
     status = exec("wsl -t docker-cli");
-    puts("OK"); 
-    Sleep(1000);
+    puts("OK");
 
     fputs("Dockerd gracefully stopped\n", stdout);
 

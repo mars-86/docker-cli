@@ -4,15 +4,6 @@
 #include "init.h"
 #include "../common/common.h"
 
-void perror_win(const char *msg)
-{
-        WCHAR *buff;
-        FormatMessageW(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
-        fprintf(stderr, "%s: %S\n", msg, buff);
-        LocalFree(buff);
-}
 /*
 int main(int argc, char *argv[])
 {
@@ -48,8 +39,8 @@ int main(int argc, char *argv[])
     );
 
     if (!status) {
-        perror_win("Create Process");
-        return ESYSTEM;
+        win_system_error("Create Process");
+        return DOCKERCLIE_SYSTEM;
     }
 
     ResumeThread(pinfo.hThread);
@@ -58,7 +49,7 @@ int main(int argc, char *argv[])
     CloseHandle(pinfo.hProcess);
     CloseHandle(pinfo.hThread);
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }
 */
 
@@ -87,5 +78,5 @@ int main(int argc, char *argv[])
     Sleep(2000);
     pthread_attr_destroy(&attr);
 
-    return EOK;
+    return DOCKERCLIE_OK;
 }

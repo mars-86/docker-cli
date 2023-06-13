@@ -1,5 +1,5 @@
-IDIR=installer/inc
-SDIR=installer/src
+IDIR=inc
+SDIR=src
 EXIDIR=../common
 EXSDIR=../common/src
 MAIN=./
@@ -10,10 +10,12 @@ OUTDIR=bin
 ODIR=obj
 LDIR =../lib
 
+LIBS=-lws2_32
+
 _DEPS =
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o cmd_line.o
+_OBJ = main.o cmd_line.o error.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAIN)/%.c $(DEPS)

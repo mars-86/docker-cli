@@ -1,15 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-int exec(const char *cmd)
-{
-#ifdef __DEBUG
-    printf("%s\n", cmd);
-#endif
-    fflush(stdout);
-    return system(cmd);
-}
+#include "../inc/cmd_line.h"
 
 const char *parse_cmdl(const char *base, const char **argv)
 {

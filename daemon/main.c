@@ -17,7 +17,7 @@ void on_sigint(int sig)
 int main(int argc, char *argv[])
 {
     show_banner();
-    printf("\nInitializing docker engine...\n");
+    puts("\nInitializing docker engine...");
     /* fix */
     Sleep(1000);
 
@@ -40,11 +40,12 @@ int main(int argc, char *argv[])
     while (!terminate)
         Sleep(1000);
 
-    printf("Shuting down dockerd: ");
+    fputs("Shuting down dockerd...", stdout);
     status = exec("wsl -t docker-cli");
+    puts("OK"); 
     Sleep(1000);
 
-    printf("Dockerd gracefully stopped\n");
+    fputs("Dockerd gracefully stopped\n", stdout);
 
     return 0;
 }

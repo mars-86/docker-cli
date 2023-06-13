@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    int status = 0;
+    DOCKERCLI_CODE status = DOCKERCLIE_OK;
     if ((status = exec("..\\..\\installer\\bin\\installer")) > 0) {
         docker_cli_error(status);
         return status;

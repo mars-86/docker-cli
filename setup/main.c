@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
-#include "../constants/inc/error_msgs.h"
 #include "../common/common.h"
 
 #define DOCKER_CLI_HOME_VAR_NAME "DOCKER_CLI_HOME"
@@ -10,7 +9,7 @@ int main(int argc, char *argv[])
 {
     int status = 0;
     if ((status = exec("..\\..\\installer\\bin\\installer")) > 0) {
-        fprintf(stderr, "%s\n", error_msg[status]);
+        docker_cli_error(status);
         return status;
     }
 
@@ -21,7 +20,7 @@ int main(int argc, char *argv[])
     // sprintf(docker_cli_path, "%s\\bin\\docker-cli", docker_cli_home_path);
 
     if ((status = exec("..\\..\\init\\bin\\docker-cli-init")) > 0) {
-        fprintf(stderr, "%s\n", error_msg[status]);
+        docker_cli_error(status);
         return status;
     }
 

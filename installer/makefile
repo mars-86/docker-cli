@@ -15,7 +15,7 @@ LIBS=-lcurl -lws2_32
 _DEPS = finish.h fs.h install.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o finish.o fs.o install.o cmd_line.o
+_OBJ = main.o finish.o fs.o install.o cmd_line.o error.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)

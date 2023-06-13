@@ -10,13 +10,15 @@ OUTDIR=bin
 ODIR=obj
 LDIR=lib
 
+LIBS=-lws2_32
+
 _DEPS =
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _EXDEPS = common.h
 EXDEPS = $(patsubst %,$(EXIDIR)/%,$(_EXDEPS))
 
-_OBJ = main.o cmd_line.o
+_OBJ = main.o cmd_line.o error.o process.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)

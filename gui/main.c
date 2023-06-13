@@ -4,16 +4,6 @@
 
 #define APPLICATION_NAME "Docker CLI"
 
-void perror_win(const char *msg)
-{
-        WCHAR *buff;
-        FormatMessageW(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
-        fprintf(stderr, "%s: %S\n", msg, buff);
-        LocalFree(buff);
-}
-
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -52,7 +42,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     int status = create_tray_icon(hwnd);
 
     if (status != DOCKERCLIE_OK) {
-        perror_win("Create tray icon");
+        win_system_error("Create tray icon");
         return status;
     }
 /*
@@ -60,7 +50,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     BOOL close_status = CloseWindow(cwin);
     if (!close_status) {
-        perror_win("Close Window");
+        win_system_error("Close Window");
     }
 
 #ifndef __DEBUG
@@ -69,7 +59,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
 
     BOOL destroy_status = DestroyWindow(cwin);
     if (!destroy_status) {
-        perror_win("Destroy Window");
+        win_system_error("Destroy Window");
     }
 */
     char daemon_path[MAX_PATH];
@@ -120,7 +110,7 @@ void ShowContextMenu(HWND hwnd, POINT pt)
     HMENU hMenu = LoadMenuA(hinst, MAKEINTRESOURCE(IDR_TRAY_POPUPMENU));
 
     if (!hMenu) {
-        perror_win("hmenu");
+        win_system_error("hmenu");
     }
 
     if (hMenu)

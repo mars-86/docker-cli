@@ -7,16 +7,6 @@
 #define WSL_PATH "C:\\Windows\\System32\\wsl.exe"
 #define BASE_ARGS " -d docker-cli -- dockerd"
 
-void perror_win(const char *msg)
-{
-        WCHAR *buff;
-        FormatMessageW(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
-        fprintf(stderr, "%s: %S\n", msg, buff);
-        LocalFree(buff);
-}
-
 static int terminate = 0;
 
 void on_sigint(int sig)
@@ -39,7 +29,7 @@ int main(int argc, char *argv[])
     free_cmdl((char *)args);
 
     if (status) {
-        perror_win("Init daemon");
+        win_system_error("Init daemon");
         return status;
     }
 

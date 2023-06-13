@@ -4,16 +4,6 @@
 #include "../inc/process.h"
 #include "../../constants/inc/error_codes.h"
 
-void perror_win2(const char *msg)
-{
-        WCHAR *buff;
-        FormatMessageW(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
-        fprintf(stderr, "%s: %S\n", msg, buff);
-        LocalFree(buff);
-}
-
 /*
 int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
 {
@@ -43,7 +33,7 @@ int init_daemon(const char *path, char *args, PROCESS_INFORMATION *proc)
     );
 
     if (!status) {
-        perror_win2("Create Process");
+        win_system_error2("Create Process");
         return DOCKERCLIE_SYSTEM;
     }
 

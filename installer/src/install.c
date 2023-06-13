@@ -10,16 +10,6 @@
 #define MKDIR_CMD "mkdir"
 #define MAX_CMD_LEN 512
 
-void perror_win(const char *msg)
-{
-        WCHAR *buff;
-        FormatMessageW(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buff, 0, NULL);
-        fprintf(stderr, "%s: %S\n", msg, buff);
-        LocalFree(buff);
-}
-
 static const LPCSTR env_skey = "Environment";
 static const LPCSTR run_skey = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
 
@@ -293,7 +283,7 @@ int install_docker_service(void)
     /*
     srvh = OpenService(mngrh, "Docker cli", SERVICE_START);
     if (!StartServiceA(srvh, 0, NULL)) {
-        perror_win("Start service");
+        win_system_error("Start service");
         return DOCKERCLIE_SYSTEM;
     }
     */

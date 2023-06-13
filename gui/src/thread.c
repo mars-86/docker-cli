@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "../../common/common.h"
+#include <windows.h>
 #include "../inc/thread.h"
 
 void *start_daemon(void *args)
@@ -11,7 +11,7 @@ void *start_daemon(void *args)
     return NULL;
 }
 
-int init_daemon(const char *path, char *args, pthread_t *tid)
+DOCKERCLI_CODE init_daemon(const char *path, char *args, pthread_t *tid)
 {
     char daemon_path[MAX_PATH];
 
@@ -27,7 +27,7 @@ int init_daemon(const char *path, char *args, pthread_t *tid)
     return DOCKERCLIE_OK;
 }
 
-int check_daemon_status(void)
+DOCKERCLI_CODE check_daemon_status(void)
 {
     int status = exec("wsl -d docker-cli curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json &> C:\\Users\\spa_1\\docker-cli\\tmp\\dockerd-status");
     

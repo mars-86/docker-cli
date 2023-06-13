@@ -29,8 +29,10 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     hinst = h_instance;
     HWND hwnd = create_main_window(CLASS_NAME, APPLICATION_NAME, h_instance, NULL);
 
-    if (hwnd == NULL)
+    if (hwnd == NULL) {
+        win_system_error("Create main window");
         return DOCKERCLIE_SYSTEM;
+    }
 
 #ifdef __DEBUG
     printf("%d\n", status);
@@ -39,10 +41,13 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     char docker_path[MAX_PATH], icon_path[MAX_PATH];
     sprintf(docker_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli");
 
-    int status = create_tray_icon(hwnd);
+    DOCKERCLI_CODE status;
+    status = create_tray_icon(hwnd);
 
     if (status != DOCKERCLIE_OK) {
-        win_system_error("Create tray icon");
+        if (status == DOCKERCLIE_SYSTEM) {
+            win_system_error("Create tray icon");
+        }
         return status;
     }
 /*
@@ -67,6 +72,10 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     sprintf(daemon_path, "%s\\daemon", docker_path);
 
     status = init_daemon(daemon_path, NULL, &daemon_tid);
+    if (status != DOCKERCLIE_OK) {
+        docker_cli_error(status);
+        return status;
+    }
 
 #ifdef __DEBUG
     printf("Init daemon: %d\n", status);

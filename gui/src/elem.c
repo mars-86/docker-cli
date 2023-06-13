@@ -31,7 +31,7 @@ HWND create_main_window(LPCSTR lpClassName, LPCSTR lpWindowName, HINSTANCE hInst
     );
 }
 
-int create_tray_icon(HWND hwnd)
+DOCKERCLI_CODE create_tray_icon(HWND hwnd)
 {
     const char tooltip_name[] = "Docker CLI";
     const char tooltip_info[] = "Docker CLI is starting...";

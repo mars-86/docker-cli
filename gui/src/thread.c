@@ -29,7 +29,7 @@ DOCKERCLI_CODE init_daemon(const char *path, char *args, pthread_t *tid)
 
 DOCKERCLI_CODE check_daemon_status(void)
 {
-    int status = exec("wsl -d docker-cli curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json &> C:\\Users\\spa_1\\docker-cli\\tmp\\dockerd-status");
+    int status = exec("wsl -d docker-cli curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json > C:\\Users\\spa_1\\docker-cli\\tmp\\dockerd-status");
     
     if (status < 0)
         return DOCKERCLIE_CHECKDAESTAT;

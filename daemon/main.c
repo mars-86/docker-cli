@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
 
     free_cmdl((char *)args);
 
-    if (status) {
-        win_system_error("Init daemon");
+    if (status != DOCKERCLIE_OK) {
+        docker_cli_error(status);
         return status;
     }
 

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <windows.h>
 #include "../inc/install.h"
-#include "../../constants/inc/error_codes.h"
 #include "../../common/common.h"
 
 #define NFOLDERS 4

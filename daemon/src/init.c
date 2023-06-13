@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include "../inc/init.h"
-#include "../../common/common.h"
-#include "../../constants/inc/error_codes.h"
 
 void show_banner(void)
 {
@@ -15,11 +13,14 @@ void show_banner(void)
     );
 }
 
-int init_daemon(const char *path, char *args)
+DOCKERCLI_CODE init_daemon(const char *path, char *args)
 {
     char daemon_cmd[256];
 
     sprintf(daemon_cmd, "%s %s %s", path, "-d docker-cli -- start-dockerd", args ? args : "");
+#ifdef __DEBUG
+    fputs(daemon_cmd, stdout);
+#endif
     int status = exec(daemon_cmd);
 
     if (status < 0)

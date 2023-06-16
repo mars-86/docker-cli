@@ -1,30 +1,20 @@
 #include <stdio.h>
 #include <windows.h>
-#include <signal.h>
 #include "daemon.h"
-#include "../common/common.h"
 
 #define WSL_PATH "C:\\Windows\\System32\\wsl.exe"
-#define BASE_ARGS " -d docker-cli -- dockerd"
-
-static int terminate = 0;
-
-void on_sigint(int sig)
-{
-    terminate = 1;
-}
+#define BASE_ARGS "-d docker-cli -- start-dockerd"
 
 int main(int argc, char *argv[])
 {
     show_banner();
-    puts("\nInitializing docker engine...");
-    /* fix */
-    Sleep(1000);
+    fputs("\nInitializing docker engine... ", stdout);
 
     const char *args = parse_cmdl(BASE_ARGS, (const char **)(argv + 1));
 
+    pthread_t daemon_tid;
     int status;
-    status = init_daemon(WSL_PATH, (char *)args);
+    status = init_daemon(WSL_PATH, (char *)args, &daemon_tid);
 
     free_cmdl((char *)args);
 
@@ -32,18 +22,26 @@ int main(int argc, char *argv[])
         docker_cli_error(status);
         return status;
     }
+    puts("OK");
 
-    /* set signal handler */
-    signal(SIGINT, on_sigint);
+    int daemon_terminate;
+    /* sleep is not a robust way to wait for events, it should be done */
+    /* using a condition variable and mutex but windows doesn't support  */
+    /* PTHREAD_PROCESS_SHARED attribute */
+    while (!(daemon_terminate = get_condition_var(DOCKER_CLI_DAEMON))) {
+#ifdef __DEBUG
+        puts("Waiting for event...");
+        printf("%d\n", daemon_terminate);
+#endif
+        Sleep(2000);
+    }
 
-    /* fix: wait for sigint */
-    while (!terminate)
-        Sleep(1000);
+    pthread_cancel(daemon_tid);
+    pthread_join(daemon_tid, NULL);
 
-    fputs("Shuting down dockerd...", stdout);
+    fputs("Shutting down dockerd... ", stdout);
     status = exec("wsl -t docker-cli");
-    puts("OK"); 
-    Sleep(1000);
+    puts("OK");
 
     fputs("Dockerd gracefully stopped\n", stdout);
 

@@ -18,8 +18,11 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _EXDEPS = common.h
 EXDEPS = $(patsubst %,$(EXIDIR)/%,$(_EXDEPS))
 
-_OBJ = main.o init.o cmd_line.o error.o process.o
+_OBJ = main.o init.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+_EXTOBJ = cmd_line.o error.o process.o
+EXTOBJ = $(patsubst %,$(ODIR)/%,$(_EXTOBJ))
 
 $(ODIR)/%.o: $(MAINDIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -38,7 +41,7 @@ $(OUTDIR):
 $(ODIR):
 	mkdir $@
 
-$(OUTDIR)/dockerd: $(OBJ)
+$(OUTDIR)/dockerd: $(OBJ) $(EXTOBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean

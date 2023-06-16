@@ -50,23 +50,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
         }
         return status;
     }
-/*
-    HWND cwin = GetConsoleWindow();
 
-    BOOL close_status = CloseWindow(cwin);
-    if (!close_status) {
-        win_system_error("Close Window");
-    }
-
-#ifndef __DEBUG
-    FreeConsole();
-#endif
-
-    BOOL destroy_status = DestroyWindow(cwin);
-    if (!destroy_status) {
-        win_system_error("Destroy Window");
-    }
-*/
     char daemon_path[MAX_PATH];
     // const char *docker_cli_home = getenv("DOCKER_CLI_HOME");
     sprintf(daemon_path, "%s\\daemon", docker_path);
@@ -82,7 +66,7 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
     printf("Process id: %d\n", pinfo.dwProcessId);
 #endif
 
-    Sleep(5000);
+    Sleep(2000);
 
     check_daemon_status();
     printf("dockerd running\n");
@@ -172,13 +156,15 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
         if (MessageBox(hwnd, "Really quit?", APPLICATION_NAME, MB_OKCANCEL) == IDOK)
         {
             DestroyWindow(hwnd);
-            // pthread_join(daemon_tid, NULL);
             // PostQuitMessage(0);
         }
         break;
     case WM_DESTROY:
-        // DestroyWindow(hwnd);
-        // pthread_join(daemon_tid, NULL);
+        set_condition_var(DOCKER_CLI_DAEMON);
+        pthread_join(daemon_tid, NULL);
+
+        remove("C:\\Users\\spa_1\\docker-cli\\tmp\\shared");
+
         PostQuitMessage(0);
         break;
     default:

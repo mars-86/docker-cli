@@ -163,7 +163,10 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
         set_condition_var(DOCKER_CLI_DAEMON);
         pthread_join(daemon_tid, NULL);
 
-        remove("C:\\Users\\spa_1\\docker-cli\\tmp\\shared");
+        char shared_path[MAX_PATH];
+        sprintf(shared_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli\\tmp\\shared");
+
+        remove(shared_path);
 
         PostQuitMessage(0);
         break;

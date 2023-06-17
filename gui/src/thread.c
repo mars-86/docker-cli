@@ -3,8 +3,6 @@
 #include <windows.h>
 #include "../inc/thread.h"
 
-#define REQUEST_CONTAINERS "curl -i -s --unix-socket /var/run/docker.sock -X GET http://localhost/containers/json"
-
 void *start_daemon(void *args)
 {
     const char *cmd = (const char *)args;

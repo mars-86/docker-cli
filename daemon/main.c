@@ -2,7 +2,6 @@
 #include <windows.h>
 #include "daemon.h"
 
-#define WSL_PATH "C:\\Windows\\System32\\wsl.exe"
 #define BASE_ARGS "-d docker-cli -- start-dockerd"
 
 int main(int argc, char *argv[])

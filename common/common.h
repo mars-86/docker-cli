@@ -6,6 +6,7 @@
 
 #include "inc/cmd_line.h"
 #include "inc/error.h"
+#include "inc/modules.h"
 #include "inc/process.h"
 
 #endif // __DOCKER_CLI_COMMON_INCLUDED_H__

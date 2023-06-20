@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "../inc/process.h"
 
+static HANDLE sharedh, sharedm;
 static FILE *shared;
 static char shared_path[MAX_PATH];
 static int daemon_terminate = 0;
@@ -57,6 +58,28 @@ int initialize_shared(void)
     fclose(shared);
 
     return 0;
+}
+
+int initialize_shared_win(void)
+{
+    const char *home = getenv("DOCKER_CLI_HOME");
+    sprintf(shared_path, "%s\\tmp\\shared", home);
+
+    if ((sharedh = CreateFileA(shared_path, GENERIC_READ | GENERIC_WRITE, 0, NULL, NULL, 0, NULL) == INVALID_HANDLE_VALUE))
+        return DOCKERCLIE_SYSTEM;
+
+    if ((sharedm = CreateFileMappingA(sharedh, NULL, PAGE_READWRITE, 0, 0, "shared_memory"))) {
+        CloseHandle(sharedh);
+        return DOCKERCLIE_SYSTEM;
+    }
+
+    return DOCKERCLIE_OK;
+}
+
+void destroy_shared_win(void)
+{
+    CloseHandle(sharedm);
+    CloseHandle(sharedh);
 }
 
 /* windows doesn't support PTHREAD_PROCESS_SHARED attribute */

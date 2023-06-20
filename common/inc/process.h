@@ -2,6 +2,7 @@
 #define __DOCKER_CLI_COMMON_PROCESS_INCLUDED_H__
 
 #include <pthread.h>
+#include "error.h"
 
 enum _DOCKER_CLI_MODULES {
     DOCKER_CLI_DAEMON

@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "../inc/process.h"
 
-static HANDLE sharedh, sharedm;
+static HANDLE sharedh, sharedm, mutex;
 static FILE *shared;
 static char shared_path[MAX_PATH];
 static int daemon_terminate = 0;
@@ -51,13 +51,22 @@ int initialize_shared(void)
     sprintf(shared_path, "%s\\tmp\\shared", home);
 
     if (!(shared = fopen(shared_path, "w")))
-        return -1;
+        return DOCKERCLIE_SYSTEM;
+
+    if (!(mutex = CreateMutexA(NULL, 0, "docker_cli_mutex"))) {
+        fclose(shared);
+        return DOCKERCLIE_SYSTEM;
+    }
 
     fputc('0', shared);
 
-    fclose(shared);
+    return DOCKERCLIE_OK;
+}
 
-    return 0;
+void destroy_shared(void)
+{
+    CloseHandle(mutex);
+    fclose(shared);
 }
 
 int initialize_shared_win(void)
@@ -68,7 +77,7 @@ int initialize_shared_win(void)
     if ((sharedh = CreateFileA(shared_path, GENERIC_READ | GENERIC_WRITE, 0, NULL, NULL, 0, NULL) == INVALID_HANDLE_VALUE))
         return DOCKERCLIE_SYSTEM;
 
-    if ((sharedm = CreateFileMappingA(sharedh, NULL, PAGE_READWRITE, 0, 0, "shared_memory"))) {
+    if ((sharedm = CreateFileMappingA(sharedh, NULL, PAGE_READWRITE, 0, 0, "docker_cli_shared"))) {
         CloseHandle(sharedh);
         return DOCKERCLIE_SYSTEM;
     }

@@ -13,6 +13,7 @@ typedef enum _DOCKER_CLI_MODULES DOCKER_CLI_MODULE;
 void initialize_modules_ipc(void);
 void destroy_modules_ipc(void);
 int initialize_shared(void);
+void destroy_shared(void);
 int set_condition_var(DOCKER_CLI_MODULE mod);
 int get_condition_var(DOCKER_CLI_MODULE mod);
 pthread_cond_t *get_thread_condition(DOCKER_CLI_MODULE mod);

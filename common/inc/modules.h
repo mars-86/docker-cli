@@ -34,6 +34,7 @@ struct _DAEMON_RESPONSE {
 
 typedef struct _DAEMON_RESPONSE daemon_res_t;
 
+DOCKERCLI_CODE read_shared(const char *path, char *dest, void *mutex);
 DOCKERCLI_CODE check_daemon_status(void);
 DOCKERCLI_CODE parse_daemon_response(daemon_res_t *res, int flags);
 void free_daemon_response(daemon_res_t *res);

@@ -18,6 +18,32 @@ typedef enum _DAEMON_RES_TYPE DAEMON_RES_TYPE;
 static int daemon_res_len[] = {PROTO_LEN, CODE_LEN, CODE_TEXT_LEN, RES_TEXT_LEN};
 static int daemon_res_typ[] = {TEXT, NUMBER, TEXT, TEXT};
 
+DOCKERCLI_CODE read_shared(const char *path, char *dest, void *mutex)
+{
+    FILE *fres;
+    char *destp = dest, daemon_stat_path[MAX_PATH];
+
+    sprintf(daemon_stat_path, "%s%s", getenv("DOCKER_CLI_HOME"), "\\tmp\\dockerd-status");
+    
+    if (mutex)
+        WaitForSingleObject(mutex, INFINITE);
+
+    if (!(fres = fopen(daemon_stat_path, "r")))
+        return DOCKERCLIE_SYSTEM;
+
+    int c;
+    while ((c = fgetc(fres)) != '\n')
+        *destp++ = c;
+    *destp = '\0';
+
+    fclose(fres);
+
+    if (mutex)
+        ReleaseMutex(mutex);
+
+    return DOCKERCLIE_OK;
+}
+
 DOCKERCLI_CODE check_daemon_status(void)
 {
     char daemon_stat_path[MAX_PATH], status_cmd[512];
@@ -33,6 +59,7 @@ DOCKERCLI_CODE check_daemon_status(void)
 }
 
 /* TODO: parse res text and data */
+/* TODO: remove from fopen to fclose and use read_shared */
 DOCKERCLI_CODE parse_daemon_response(daemon_res_t *res, int flags)
 {
     FILE *fres;

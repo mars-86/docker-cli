@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "installer.h"
-#include "../constants/inc/error_codes.h"
+#include "../common/common.h"
 
 int main(int argc, char *argv[])
 {

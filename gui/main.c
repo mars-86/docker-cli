@@ -61,23 +61,28 @@ int WINAPI WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR lp_cmd
         return status;
     }
 
+    /* temporary workaround */
+    /* if we don't wait wsl initialization we get an error */
+    Sleep(3000);
+
 #ifdef __DEBUG
     printf("Init daemon: %d\n", status);
-    printf("Process id: %d\n", pinfo.dwProcessId);
 #endif
 
-    Sleep(2000);
+    daemon_res_t dres;
+    do {
+        Sleep(1000);
+        check_daemon_status();
+        parse_daemon_response(&dres, DAEMON_RES_STATUS);
+#ifdef __DEBUG
+        printf("gui: %s %s %s\n", dres.proto, dres.code, dres.code_text);
+        printf("res: %d\n", atoi(dres.code));
+#endif
+    } while (atoi(dres.status->t_code) != 200);
 
-    check_daemon_status();
-    printf("dockerd running\n");
+    free_daemon_response(&dres);
+    puts("dockerd running");
 
-    SetForegroundWindow(GetConsoleWindow());
-    // ShowWindow(GetConsoleWindow(), SW_HIDE);
-
-    // CloseWindow(GetConsoleWindow());
-    // FreeConsole();
-    // DestroyWindow(GetConsoleWindow());
-    
     // Run the message loop.
     MSG msg = {};
     BOOL bRet;
@@ -164,7 +169,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_para
         pthread_join(daemon_tid, NULL);
 
         char shared_path[MAX_PATH];
-        sprintf(shared_path, "%s%s", getenv("USERPROFILE"), "\\docker-cli\\tmp\\shared");
+        sprintf(shared_path, "%s%s", getenv("DOCKER_CLI_HOME"), "\\tmp\\shared");
 
         remove(shared_path);
 

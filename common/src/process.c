@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "../inc/process.h"
 
+static HANDLE sharedh, sharedm, mutex;
 static FILE *shared;
 static char shared_path[MAX_PATH];
 static int daemon_terminate = 0;
@@ -50,13 +51,44 @@ int initialize_shared(void)
     sprintf(shared_path, "%s\\tmp\\shared", home);
 
     if (!(shared = fopen(shared_path, "w")))
-        return -1;
+        return DOCKERCLIE_SYSTEM;
+
+    if (!(mutex = CreateMutexA(NULL, 0, "docker_cli_mutex"))) {
+        fclose(shared);
+        return DOCKERCLIE_SYSTEM;
+    }
 
     fputc('0', shared);
 
-    fclose(shared);
+    return DOCKERCLIE_OK;
+}
 
-    return 0;
+void destroy_shared(void)
+{
+    CloseHandle(mutex);
+    fclose(shared);
+}
+
+int initialize_shared_win(void)
+{
+    const char *home = getenv("DOCKER_CLI_HOME");
+    sprintf(shared_path, "%s\\tmp\\shared", home);
+
+    if ((sharedh = CreateFileA(shared_path, GENERIC_READ | GENERIC_WRITE, 0, NULL, NULL, 0, NULL) == INVALID_HANDLE_VALUE))
+        return DOCKERCLIE_SYSTEM;
+
+    if ((sharedm = CreateFileMappingA(sharedh, NULL, PAGE_READWRITE, 0, 0, "docker_cli_shared"))) {
+        CloseHandle(sharedh);
+        return DOCKERCLIE_SYSTEM;
+    }
+
+    return DOCKERCLIE_OK;
+}
+
+void destroy_shared_win(void)
+{
+    CloseHandle(sharedm);
+    CloseHandle(sharedh);
 }
 
 /* windows doesn't support PTHREAD_PROCESS_SHARED attribute */

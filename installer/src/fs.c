@@ -40,6 +40,11 @@ void get_fs(void)
         char errbuff[CURL_ERROR_SIZE];
         curl_easy_setopt(curl, CURLOPT_URL, FS_URL);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuff);
+
+        //Do not use CA verify
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+
+
 #ifdef __DEBUG
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 #endif

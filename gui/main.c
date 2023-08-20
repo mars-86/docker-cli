@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include "./inc/thread.h"
 #include "gui.h"
 
 #define APPLICATION_NAME "Docker CLI"
@@ -133,28 +134,29 @@ void ShowContextMenu(HWND hwnd, POINT pt)
 
 LRESULT CALLBACK windowProc(HWND hwnd, UINT u_msg, WPARAM w_param, LPARAM l_param)
 {
+    POINT pt; // = { LOWORD(w_param), HIWORD(w_param) };
     switch (u_msg) {
     case WM_CREATE:
         // here should be the initialization process
         break;
     case WM_NOTIFYCALLBACK:
         switch (LOWORD(l_param)) {
-        case WM_LBUTTONDBLCLK:
-            ShowWindow(hwnd, SW_SHOW);
-            break;
-        case WM_CONTEXTMENU:
-            POINT pt; // = { LOWORD(w_param), HIWORD(w_param) };
-            GetCursorPos(&pt);
-#ifdef __DEBUG
-            printf("x: %d - y: %d\n", pt.x, pt.y);
-#endif
-            ShowContextMenu(hwnd, pt);
-            break;
-        default:
-#ifdef __DEBUG
-            printf("X %d\n", LOWORD(w_param));
-            printf("Event %d\n", LOWORD(l_param));
-#endif
+            case WM_LBUTTONDBLCLK:
+                ShowWindow(hwnd, SW_SHOW);
+                break;
+            case WM_CONTEXTMENU:
+                GetCursorPos(&pt);
+                #ifdef __DEBUG
+                    printf("x: %d - y: %d\n", pt.x, pt.y);
+                #endif
+                    ShowContextMenu(hwnd, pt);
+                break;
+            default:
+                #ifdef __DEBUG
+                            printf("X %d\n", LOWORD(w_param));
+                            printf("Event %d\n", LOWORD(l_param));
+                #endif
+                break;
         }
         break;
     case WM_CLOSE:

@@ -177,7 +177,7 @@ int install(const char *base_path)
         return DOCKERCLIE_CANNOTIFS;
 */
 
-    edit_dns();
+    // edit_dns();
     copy_start_scripts();
 
     /* terminate vm to set changes */

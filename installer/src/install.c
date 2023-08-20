@@ -72,7 +72,7 @@ static int mk_folders(const char *base_path)
 static int copy_docker(const char *base_path)
 {
     char cp_cmd[MAX_CMD_LEN];
-    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\init\\bin\\docker-cli-init", base_path, "\\docker-cli\\bin\\");
+    sprintf(cp_cmd, "%s %s%s", "copyx ..\\..\\init\\bin", base_path, "\\docker-cli\\bin\\");
 
     int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
@@ -83,7 +83,7 @@ static int copy_docker(const char *base_path)
 static int copy_daemon(const char *base_path)
 {
     char cp_cmd[MAX_CMD_LEN];
-    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\daemon\\bin\\dockerd", base_path, "\\docker-cli\\daemon\\");
+    sprintf(cp_cmd, "%s %s%s", "copyx ..\\..\\daemon\\bin", base_path, "\\docker-cli\\daemon\\");
 
     int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
@@ -94,7 +94,7 @@ static int copy_daemon(const char *base_path)
 static int copy_bin_cli(const char *base_path)
 {
     char cp_cmd[MAX_CMD_LEN];
-    sprintf(cp_cmd, "%s %s%s", "cp -r ..\\..\\cli\\bin\\docker", base_path, "\\docker-cli\\cli\\");
+    sprintf(cp_cmd, "%s %s%s", "copyx ..\\..\\cli\\bin", base_path, "\\docker-cli\\cli\\");
     
     int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
@@ -105,7 +105,7 @@ static int copy_bin_cli(const char *base_path)
 static int copy_assets(const char *base_path)
 {
     char cp_cmd[MAX_CMD_LEN];
-    sprintf(cp_cmd, "%s %s%s", "cp ..\\..\\assets\\settings.ico", base_path, "\\docker-cli\\");
+    sprintf(cp_cmd, "%s %s%s", "copyx ..\\..\\assets\\settings.ico", base_path, "\\docker-cli\\");
     
     int status = DOCKERCLIE_OK;
     status = exec(cp_cmd);
@@ -177,7 +177,7 @@ int install(const char *base_path)
         return DOCKERCLIE_CANNOTIFS;
 */
 
-    edit_dns();
+    // edit_dns();
     copy_start_scripts();
 
     /* terminate vm to set changes */

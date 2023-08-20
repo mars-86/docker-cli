@@ -11,7 +11,7 @@ void *daemon_start(void *args)
     return NULL;
 }
 
-DOCKERCLI_CODE daemon_init(const char *path, char *args, pthread_t *tid)
+DOCKERCLI_CODE init_daemon(const char *path, char *args, pthread_t *tid)
 {
     char daemon_path[MAX_PATH];
 

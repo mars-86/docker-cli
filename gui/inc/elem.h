@@ -5,6 +5,7 @@
 #include "../../common/common.h"
 
 #define WM_NOTIFYCALLBACK 0x8001
+#define NOTIFYICON_VERSION_4 4
 
 HICON load_icon(HINSTANCE hinst, const char *path);
 HWND create_main_window(LPCSTR lpClassName, LPCSTR lpWindowName, HINSTANCE hInstance, LPVOID lpParam);

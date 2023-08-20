@@ -29,6 +29,13 @@ Run docker command from console.
 
 ## Building for source
 - Install mingw https://www.mingw-w64.org/
+
+    ##### Library Dependency
+    - [curl](https://curl.se/)
+    - [pthreads](https://github.com/fwbuilder/pthreads4w)
+    ##### Tips 
+    1. Put all libs into `mingw64/x86_64-w64-mingw32`
+    
 - Add bin folder to path
 - Clone the repository
 - Run compile.bat

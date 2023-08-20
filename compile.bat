@@ -1,5 +1,14 @@
 @ECHO off
 
+set folderPath=".\gui\obj"
+
+if not exist %folderPath% (
+    mkdir %folderPath%
+    echo gui obj folder created successfully.
+) else (
+    echo gui obj folder already exists.
+)
+
 windres -i .\gui\resources.rc -o .\gui\obj\resources.o
 
 cd setup

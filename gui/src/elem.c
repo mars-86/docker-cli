@@ -73,6 +73,7 @@ DOCKERCLI_CODE create_tray_icon(HWND hwnd)
         return DOCKERCLIE_SYSTEM;
 
     nicon.uVersion = NOTIFYICON_VERSION_4;
+    // nicon.uVersion=4;
     status = Shell_NotifyIconA(NIM_SETVERSION, &nicon);
     if (!status)
         return DOCKERCLIE_SYSTEM;
